@@ -42,6 +42,7 @@ export default function Home() {
                   id=""
                   cover_image_url={model.cover_image_url}
                   name={model.name}
+                  owner={model.owner}
                 />
               </div>
             );

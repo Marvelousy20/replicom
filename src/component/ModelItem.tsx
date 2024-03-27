@@ -5,16 +5,26 @@ interface ModelItemProps {
   id: string;
   cover_image_url: string;
   name: string;
+  owner: string;
 }
 
 export default function ModelItem({
   cover_image_url,
   name,
-  id,
+  owner,
 }: ModelItemProps) {
-  const getModelDetails = () => {};
+  const getModelDetails = async (owner: string, name: string) => {
+    try {
+      const response = await fetch(`/api/model?owner=${owner}&name=${name}`);
+      const result = await response.json();
+      console.log("DETAILS", result);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <div>
+    <div onClick={() => getModelDetails(owner, name)}>
       {cover_image_url !== null ? (
         <div className="h-[300px] w-[300px]">
           <Image
