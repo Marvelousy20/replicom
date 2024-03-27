@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server";
+import axios from "axios";
+
+export async function GET({ query }) {
+  const { owner, name } = query;
+
+  try {
+    const response = await axios.get(
+      `https://api.replicate.com/v1/models/${owner}/${name}`,
+      {
+        headers: {
+          Authorization: `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(response);
+    return new NextResponse(JSON.stringify(response.data));
+  } catch (error) {
+    console.error(error);
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to fetch model details" }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+}
