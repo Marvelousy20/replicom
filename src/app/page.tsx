@@ -4,9 +4,11 @@ import Image from "next/image";
 import ModelItem from "@/component/ModelItem";
 
 interface ModelProps {
+  cover_image_url: string;
   name: string;
   owner: string;
-  cover_image_url: string;
+  createdAt: string;
+  description: string;
 }
 
 export default function Home() {
@@ -28,7 +30,7 @@ export default function Home() {
     getModels();
   }, []);
   return (
-    <main className="p-24 max-w-6xl mx-auto">
+    <main className="">
       {/* Get all model */}
 
       <h1 className="text-4xl text-center font-bold mb-10">Public Models</h1>
@@ -39,7 +41,6 @@ export default function Home() {
             return (
               <div key={index}>
                 <ModelItem
-                  id=""
                   cover_image_url={model.cover_image_url}
                   name={model.name}
                   owner={model.owner}
