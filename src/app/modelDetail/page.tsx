@@ -63,7 +63,7 @@ export default function ModelDetails() {
               height={400}
             />
           ) : (
-            <div className="h-[400px] w-[700px] bg-red-500"></div>
+            <div className="h-[400px] w-300px lg:w-[700px] bg-red-500"></div>
           )}
           <h1 className="text-3xl mt-4 font-bold">Name: {modelDetails.name}</h1>
           <p className="text-lg font-bold">Owner: {modelDetails.owner}</p>
