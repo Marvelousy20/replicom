@@ -25,12 +25,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await fetch("https://api.replicate.com/v1/predictions", {
+    console.log(formData);
+    const response = await fetch("/api/output", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
     });
     const data = await response.json();
     console.log(data);

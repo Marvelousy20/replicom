@@ -1,21 +1,31 @@
+// Import necessary modules
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { type NextRequest } from "next/server";
 
-export async function POST(request: Request) {
+// Define the POST handler function
+export async function POST(request: NextRequest) {
+  // Parse the request body
+  const formData = await request.json();
+
+  // Check if formData is provided
+  if (!formData) {
+    return new NextResponse(
+      JSON.stringify({ error: "Form data is required" }),
+      {
+        status: 400, // Bad Request
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
   try {
-    // Assuming the request body contains the form data
-    const formData = new FormData(request.body);
-
-    // Convert FormData to JSON if needed for the API
-    // Note: This step is optional and depends on the API's requirements
-    const data = {};
-    for (const [key, value] of formData.entries()) {
-      data[key] = value;
-    }
-
+    // Make the POST request to the external API
     const response = await axios.post(
-      "https://api.replicate.com/v1/predictions",
-      data,
+      `https://api.replicate.com/v1/predictions`,
+      formData,
       {
         headers: {
           Authorization: `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`,
@@ -24,14 +34,15 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log(response);
+    // Return the response data
     return new NextResponse(JSON.stringify(response.data));
   } catch (error) {
     console.error(error);
+    // Return an error response
     return new NextResponse(
-      JSON.stringify({ error: "Failed to submit prediction" }),
+      JSON.stringify({ error: "Failed to make prediction" }),
       {
-        status: 500,
+        status: 500, // Internal Server Error
         headers: {
           "Content-Type": "application/json",
         },
