@@ -4,7 +4,25 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Suspense } from "react";
-import DynamicForm from "@/component/DynamicForm";
+import DynamicForm from "@/components/DynamicForm";
+import { InputSchema } from "../../../types";
+
+interface Component {
+  schemas: {
+    Input: {
+      properties: {
+        bottom: string;
+        feathering: string;
+        image: string;
+        left: string;
+        right: string;
+      }[];
+    };
+  };
+}
+interface Version {
+  components: Component[];
+}
 
 interface ModelProps {
   cover_image_url: string;
@@ -13,51 +31,18 @@ interface ModelProps {
   createdAt: string;
   description: string;
   run_count: number;
+  latestVersion: {
+    openapi_schema?: {
+      components?: {
+        schemas?: {
+          Input?: {
+            properties?: InputSchema;
+          };
+        };
+      };
+    };
+  };
 }
-
-const inputSchema = {
-  bottom: {
-    type: "integer",
-    title: "Bottom",
-    default: 0,
-    description: "Outpainting on bottom",
-  },
-  feathering: {
-    type: "integer",
-    title: "Feathering",
-    default: 40,
-    description: "Type the feathering",
-  },
-  image: {
-    type: "string",
-    title: "Image",
-    format: "uri",
-    description: "Image",
-  },
-  left: {
-    type: "integer",
-    title: "Left",
-    default: 0,
-    description: "Outpainting on left",
-  },
-  right: {
-    type: "integer",
-    title: "Right",
-    default: 0,
-    description: "Outpainting on right",
-  },
-  seed: {
-    type: "integer",
-    title: "Seed",
-    description: "Fill in with seed number",
-  },
-  top: {
-    type: "integer",
-    title: "Top",
-    default: 0,
-    description: "Outpainting on top",
-  },
-};
 
 export default function ModelDetails() {
   const router = useRouter();
@@ -86,11 +71,16 @@ export default function ModelDetails() {
     }
   }, [owner, name]);
 
+  const inputSchema =
+    (modelDetails as any)?.latest_version?.openapi_schema?.components?.schemas
+      ?.Input?.properties || {};
+
   if (!modelDetails) {
     return <div>Loading...</div>;
   }
 
-  console.log(modelDetails);
+  console.log(inputSchema);
+
   return (
     <Suspense>
       <div className="flex flex-col items-center">
@@ -116,20 +106,14 @@ export default function ModelDetails() {
               ) : (
                 <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
               )}
-              <h1 className="text-3xl mt-4 font-bold">
-                Name: {modelDetails.name}
-              </h1>
-              <p className="text-lg font-bold">Owner: {modelDetails.owner}</p>
-
-              <h1 className="text-lg mt-4">
-                Description: {modelDetails.description}
-              </h1>
-              {/* <h1 className="text-lg mt-4">Created At: {modelDetails.createdAt}</h1> */}
-              <p className="text-lg">Run Count: {modelDetails.run_count}</p>
+              <div className="flex items-center mt-4 gap-4">
+                <h1 className="text-3xl font-bold">{modelDetails.name}</h1>
+                <p className="text-lg font-bold"> {modelDetails.owner}</p>
+              </div>
 
               {/* Dynamic Input */}
               <div className="mt-10">
-
+                <DynamicForm schema={inputSchema} />
               </div>
             </div>
 

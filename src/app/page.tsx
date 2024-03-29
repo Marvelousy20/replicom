@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import ModelItem from "@/component/ModelItem";
+import ModelItem from "@/components/ModelItem";
 
 interface ModelProps {
   cover_image_url: string;
