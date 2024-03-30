@@ -65,7 +65,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
       {Object.entries(schema).map(([key, field]) => (
         <div key={key} className="flex flex-col">
           <label htmlFor={key} className="text-sm font-medium text-gray-700">
-            {field.title !== null ? field.title : field.title}
+            {key}
           </label>
           {field.type === "file" ? (
             <input
