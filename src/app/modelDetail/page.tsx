@@ -32,6 +32,7 @@ interface ModelProps {
   description: string;
   run_count: number;
   latestVersion: {
+    id: string;
     openapi_schema?: {
       components?: {
         schemas?: {
@@ -79,7 +80,10 @@ export default function ModelDetails() {
     return <div>Loading...</div>;
   }
 
-  console.log(inputSchema);
+  // console.log(inputSchema);
+  console.log(modelDetails);
+  const version = (modelDetails as any)?.latest_version?.id;
+  // console.log((modelDetails as any)?.latest_version?.id);
 
   return (
     <Suspense>
@@ -113,7 +117,7 @@ export default function ModelDetails() {
 
               {/* Dynamic Input */}
               <div className="mt-10">
-                <DynamicForm schema={inputSchema} />
+                <DynamicForm schema={inputSchema} version={version} />
               </div>
             </div>
 

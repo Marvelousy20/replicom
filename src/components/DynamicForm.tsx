@@ -7,9 +7,10 @@ type FormData = {
 
 type DynamicFormProps = {
   schema: InputSchema;
+  version: string;
 };
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({ schema, version }) => {
   const [formData, setFormData] = useState<FormData>({});
 
   const handleInputChange = (
@@ -35,29 +36,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
     });
     const data = await response.json();
     console.log(data);
-    // // Handle the response as needed
-    // event.preventDefault();
-    // console.log(formData);
-
-    // try {
-    //   const response = await fetch("http://localhost:3001/api/predictions", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
-
-    //   if (response.ok) {
-    //     const data = await response.json();
-    //     console.log(data);
-    //     // Handle the response as needed
-    //   } else {
-    //     console.error("Failed to submit form");
-    //   }
-    // } catch (error) {
-    //   console.error("Error response:", error);
-    // }
   };
 
   return (
