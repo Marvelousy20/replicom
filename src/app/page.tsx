@@ -18,8 +18,6 @@ export default function Home() {
     try {
       const response = await fetch("/api");
       const result = await response.json();
-      console.log(result);
-      console.log("RESULT", result.results);
       setModels(result.results);
     } catch (error) {
       console.error(error);

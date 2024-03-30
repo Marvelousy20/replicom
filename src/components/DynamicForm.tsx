@@ -28,10 +28,36 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
     console.log(formData);
     const response = await fetch("/api/output", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
     const data = await response.json();
     console.log(data);
-    // Handle the response as needed
+    // // Handle the response as needed
+    // event.preventDefault();
+    // console.log(formData);
+
+    // try {
+    //   const response = await fetch("http://localhost:3001/api/predictions", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(formData),
+    //   });
+
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     console.log(data);
+    //     // Handle the response as needed
+    //   } else {
+    //     console.error("Failed to submit form");
+    //   }
+    // } catch (error) {
+    //   console.error("Error response:", error);
+    // }
   };
 
   return (
@@ -39,7 +65,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
       {Object.entries(schema).map(([key, field]) => (
         <div key={key} className="flex flex-col">
           <label htmlFor={key} className="text-sm font-medium text-gray-700">
-            {field.title}
+            {field.title !== null ? field.title : field.title}
           </label>
           {field.type === "file" ? (
             <input
