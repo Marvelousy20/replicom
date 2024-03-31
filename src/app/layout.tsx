@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+import { PredictionContextProvider } from "@/coontext/prediction";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,9 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} p-24 max-w-6xl mx-auto`}>
-        {children}
-      </body>
+      <PredictionContextProvider>
+        <body className={`${inter.className} p-8 lg:p-24 max-w-8xl mx-auto`}>
+          {children}
+        </body>
+      </PredictionContextProvider>
     </html>
   );
 }

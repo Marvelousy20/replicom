@@ -6,6 +6,8 @@ import Image from "next/image";
 import { Suspense } from "react";
 import DynamicForm from "@/components/DynamicForm";
 import { InputSchema } from "../../../types";
+import { usePredictionContext } from "@/coontext/prediction";
+import Loading from "@/components/Loading";
 
 interface Component {
   schemas: {
@@ -51,8 +53,9 @@ export default function ModelDetails() {
 
   const name = searchParams.get("name");
   const owner = searchParams.get("owner");
-  console.log(owner, name);
+
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
+  const { globalPredictions, setGlobalPredictions } = usePredictionContext();
 
   useEffect(() => {
     if (owner && name) {
@@ -80,10 +83,15 @@ export default function ModelDetails() {
     return <div>Loading...</div>;
   }
 
-  // console.log(inputSchema);
-  console.log(modelDetails);
   const version = (modelDetails as any)?.latest_version?.id;
-  // console.log((modelDetails as any)?.latest_version?.id);
+
+  console.log("PREDICTIONS", globalPredictions);
+  const handleBack = () => {
+    router.back();
+    setGlobalPredictions(null);
+  };
+
+  console.log(modelDetails);
 
   return (
     <Suspense>
@@ -91,14 +99,15 @@ export default function ModelDetails() {
         <div>
           <div
             className="mb-4 bg-blue-500 p-2 px-6 inline-flex rounded-md text-white"
-            onClick={() => router.back()}
+            onClick={handleBack}
           >
             Back
           </div>
           {/* Content */}
-          <div className="grid grid-cols-2 gap-4 mt-8">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 mt-8 gap-10 justify-center flex-wrap">
             {/* Output */}
-            <div>
+            <div className="!col-span-1">
               <h2 className="mb-4 text-3xl">INPUT</h2>
               {modelDetails.cover_image_url ? (
                 <Image
@@ -114,16 +123,53 @@ export default function ModelDetails() {
                 <h1 className="text-3xl font-bold">{modelDetails.name}</h1>
                 <p className="text-lg font-bold"> {modelDetails.owner}</p>
               </div>
+              <div>
+                <p className="text-[.75rem] break-words mt-1">
+                  {modelDetails.cover_image_url}
+                </p>
+              </div>
 
               {/* Dynamic Input */}
               <div className="mt-10">
-                <DynamicForm schema={inputSchema} version={version} />
+                <DynamicForm
+                  schema={inputSchema}
+                  version={version}
+                  image={modelDetails.cover_image_url}
+                />
               </div>
             </div>
 
             {/* Input */}
-            <div>
+            <div className="col-span-1">
               <h2 className="mb-4 text-3xl">OUTPUT</h2>
+              {globalPredictions && (
+                <div>
+                  {globalPredictions.output && (
+                    <div>
+                      {/* <Image
+                        fill
+                        src={`${
+                          globalPredictions.output[
+                            globalPredictions.output.length - 1
+                          ]
+                        }`}
+                        alt="output"
+                        sizes="100vw"
+                      /> */}
+                      <Image
+                        src={globalPredictions.output}
+                        alt="image"
+                        width={700}
+                        height={400}
+                      />
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    status: {globalPredictions.status}
+                    {globalPredictions.status !== "succeeded" && <Loading />}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

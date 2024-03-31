@@ -1,11 +1,10 @@
 import axios from "axios";
 
-import { NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: Request, res: NextApiResponse) {
   const body = await request.json();
-  console.log(body);
   try {
     const response = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
@@ -26,7 +25,7 @@ export async function POST(request: Request, res: NextApiResponse) {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const predictionId = searchParams.get("id");
-  console.log(predictionId);
+
   if (!predictionId) {
     return new NextResponse(
       JSON.stringify({ error: "Prediction ID parameter is required" }),

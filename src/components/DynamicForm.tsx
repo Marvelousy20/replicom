@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import { InputSchema } from "../../types";
-
+import { usePredictionContext } from "@/coontext/prediction";
 type FormData = {
   [key: string]: string | number;
 };
@@ -8,16 +8,21 @@ type FormData = {
 type DynamicFormProps = {
   schema: InputSchema;
   version: string;
+  image: string;
 };
 
-type OutputProps = {
-  id: string;
-  model: string;
-};
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ schema, version }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({
+  schema,
+  version,
+  image,
+}) => {
   const [formData, setFormData] = useState<FormData>({});
-  const [output, setOput] = useState({});
+  const [prediction, setPrediction] = useState(null);
+  const [error, setError] = useState(null);
+
+  const { setGlobalPredictions } = usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -35,14 +40,19 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, version }) => {
 
     const inputData = Object.fromEntries(
       Object.entries(formData).map(([key, value]) => {
+        if (
+          key === "image" ||
+          (key === "input_image" && typeof value === "string")
+        ) {
+          return [key, image];
+        }
         const valueStr = typeof value === "number" ? value.toString() : value;
 
         return [key, parseInt(valueStr, 10)];
       })
     );
     const requestBody = { version, input: inputData };
-    console.log("Request Body:", JSON.stringify(requestBody, null, 2));
-
+    console.log(requestBody);
     const response = await fetch("/api/output", {
       method: "POST",
       headers: {
@@ -50,44 +60,35 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema, version }) => {
       },
       body: JSON.stringify(requestBody),
     });
-    const data = await response.json();
-    console.log("DATA", data);
 
-    const predictionId = data.id;
-    const predictionResult = await pollPrediction(predictionId);
-    setOput(predictionResult);
-  };
+    let prediction = await response.json();
 
-  async function pollPrediction(
-    predictionId: string,
-    interval = 5000,
-    maxAttempts = 10
-  ) {
-    let attempts = 0;
-    while (attempts < maxAttempts) {
-      const response = await fetch(`/api/output?id=${predictionId}`, {
-        headers: {
-          Authorization: `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
+    if (response.status !== 200) {
+      setError(prediction.detail);
+      return;
+    }
+    setPrediction(prediction);
+    const predictionId = prediction.id;
+    console.log("Prediction", prediction);
 
-      if (data.status === "completed") {
-        console.log("Prediction completed:", data);
-        return data;
-      } else if (data.status === "failed") {
-        console.error("Prediction failed:", data);
-        return null;
+    while (
+      prediction.status !== "succeeded" &&
+      prediction.status !== "failed"
+    ) {
+      await sleep(1000);
+      const response = await fetch(`/api/output?id=${predictionId}`);
+      prediction = await response.json();
+      if (response.status !== 200) {
+        setError(prediction.detail);
+        return;
       }
 
-      attempts++;
-      await new Promise((resolve) => setTimeout(resolve, interval));
+      setPrediction(prediction);
+      setGlobalPredictions(prediction);
     }
 
-    console.error("Max attempts reached without completion.");
-    return null;
-  }
+    setFormData({});
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
