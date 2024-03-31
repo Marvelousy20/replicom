@@ -85,13 +85,10 @@ export default function ModelDetails() {
 
   const version = (modelDetails as any)?.latest_version?.id;
 
-  console.log("PREDICTIONS", globalPredictions);
   const handleBack = () => {
     router.back();
     setGlobalPredictions(null);
   };
-
-  console.log(modelDetails);
 
   return (
     <Suspense>
@@ -165,8 +162,9 @@ export default function ModelDetails() {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    status: {globalPredictions.status}
-                    {globalPredictions.status !== "succeeded" && <Loading />}
+                    status: {globalPredictions.status} 
+                    {globalPredictions.status !== "succeeded" ||
+                      (globalPredictions.status === "failed" && <Loading />)}
                   </div>
                 </div>
               )}

@@ -2,7 +2,7 @@ export type InputSchema = {
   [key: string]: {
     type?: string;
     title: string;
-    default?: string | number;
+    default?: string | number | boolean;
     description?: string;
     format?: string;
     maximum?: number;

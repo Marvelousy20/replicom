@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { InputSchema } from "../../types";
 import { usePredictionContext } from "@/coontext/prediction";
 type FormData = {
-  [key: string]: string | number;
+  [key: string]: string | number | boolean;
 };
 
 type DynamicFormProps = {
@@ -35,11 +35,22 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     setFormData({ ...formData, [key]: value });
   };
 
+  const handleBooleanInputChange = (
+    event: ChangeEvent<HTMLSelectElement>,
+    key: string
+  ) => {
+    const value = event.target.value === "true"; // Convert string "true" or "false" to boolean
+    setFormData({ ...formData, [key]: value });
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const inputData = Object.fromEntries(
       Object.entries(formData).map(([key, value]) => {
+        if (typeof value === "boolean") {
+          return [key, value];
+        }
         if (
           key === "image" ||
           (key === "input_image" && typeof value === "string")
@@ -69,7 +80,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     }
     setPrediction(prediction);
     const predictionId = prediction.id;
-    console.log("Prediction", prediction);
 
     while (
       prediction.status !== "succeeded" &&
@@ -86,6 +96,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       setPrediction(prediction);
       setGlobalPredictions(prediction);
     }
+    console.log("Prediction", prediction);
 
     setFormData({});
   };
@@ -101,7 +112,9 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             <select
               id={key}
               name={key}
-              value={formData[key] || ""}
+              value={
+                formData[key] !== undefined ? formData[key].toString() : ""
+              }
               onChange={(event) => handleInputChange(event, key)}
               className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
             >
@@ -109,6 +122,20 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               <option value="256">256</option>
               <option value="512">516</option>
               <option value="768">768</option>
+            </select>
+          ) : field.type === "boolean" ? (
+            <select
+              id={key}
+              name={key}
+              value={
+                formData[key] !== undefined ? formData[key].toString() : ""
+              }
+              onChange={(event) => handleBooleanInputChange(event, key)}
+              className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+            >
+              <option value="">Select</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
           ) : (
             <input
