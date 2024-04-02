@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { InputSchema } from "../../types";
 import { usePredictionContext } from "@/coontext/prediction";
 type FormData = {
@@ -18,20 +18,49 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   version,
   image,
 }) => {
-  const [formData, setFormData] = useState<FormData>({});
+  const initialFormData = Object.fromEntries(
+    Object.entries(schema).map(([key, field]) => [
+      key,
+      field.default !== undefined ? field.default : "",
+    ])
+  );
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [prediction, setPrediction] = useState(null);
   const [error, setError] = useState(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [resetKey, setResetKey] = useState(0);
 
   const { setGlobalPredictions } = usePredictionContext();
+
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  //   key: string
+  // ) => {
+  //   const value =
+  //     event.target.type === "number"
+  //       ? parseFloat(event.target.value)
+  //       : event.target.value;
+  //   setFormData({ ...formData, [key]: value });
+  // };
 
   const handleInputChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     key: string
   ) => {
-    const value =
-      event.target.type === "number"
-        ? parseFloat(event.target.value)
-        : event.target.value;
+    let value: string | number = event.target.value;
+
+    // Convert value to integer for specific fields
+    // if (
+    //   key === "left" ||
+    //   key === "seed" ||
+    //   key === "top" ||
+    //   key === "right" ||
+    //   key === "bottom "
+    // ) {
+    //   value = parseInt(value, 10);
+    // }
+
+    value = parseInt(value, 10);
     setFormData({ ...formData, [key]: value });
   };
 
@@ -43,6 +72,22 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     setFormData({ ...formData, [key]: value });
   };
 
+  const handleFileChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    key: string
+  ) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        // Update formData with the Base64 encoded string for the image
+        setFormData({ ...formData, [key]: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -51,19 +96,21 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
         if (typeof value === "boolean") {
           return [key, value];
         }
-        if (
-          key === "image" ||
-          (key === "input_image" && typeof value === "string")
-        ) {
-          return [key, image];
-        }
+        // if (
+        //   key === "image" ||
+        //   (key === "input_image" && typeof value === "string")
+        // ) {
+        //   return [key, fileName];
+        // }
         const valueStr = typeof value === "number" ? value.toString() : value;
 
         return [key, parseInt(valueStr, 10)];
       })
     );
-    const requestBody = { version, input: inputData };
-    console.log(requestBody);
+    // const requestBody = { version, input: inputData };
+    const requestBody = { version, input: formData };
+    console.log("INPUT DATA", inputData);
+    console.log("SENT TO BACKEND", requestBody);
     const response = await fetch("/api/output", {
       method: "POST",
       headers: {
@@ -73,13 +120,21 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     });
 
     let prediction = await response.json();
-
+    console.log(response);
     if (response.status !== 200) {
       setError(prediction.detail);
       return;
     }
     setPrediction(prediction);
+
+    if (prediction.status === 422) {
+      console.error("Prediction error:", prediction.detail);
+      alert(`Prediction Error: ${prediction.detail}`);
+      return;
+    }
+
     const predictionId = prediction.id;
+    console.log(prediction);
 
     while (
       prediction.status !== "succeeded" &&
@@ -98,64 +153,87 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
     }
     console.log("Prediction", prediction);
 
-    setFormData({});
+    setFormData(initialFormData);
+    setResetKey((prevKey) => prevKey + 1);
   };
+
+  const handleReset = () => {
+    setFormData(initialFormData);
+    setResetKey((prevKey) => prevKey + 1);
+  };
+
+  console.log("FORMDATA", formData);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {Object.entries(schema).map(([key, field]) => (
-        <div key={key} className="flex flex-col">
-          <label htmlFor={key} className="text-sm font-medium text-gray-700">
-            {key}
-          </label>
-          {["top", "bottom", "right", "left"].includes(key) ? (
-            <select
-              id={key}
-              name={key}
-              value={
-                formData[key] !== undefined ? formData[key].toString() : ""
-              }
-              onChange={(event) => handleInputChange(event, key)}
-              className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
-            >
-              <option value="0">0</option>
-              <option value="256">256</option>
-              <option value="512">516</option>
-              <option value="768">768</option>
-            </select>
-          ) : field.type === "boolean" ? (
-            <select
-              id={key}
-              name={key}
-              value={
-                formData[key] !== undefined ? formData[key].toString() : ""
-              }
-              onChange={(event) => handleBooleanInputChange(event, key)}
-              className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
-            >
-              <option value="">Select</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-          ) : (
-            <input
-              type={field.type || "number"}
-              id={key}
-              name={key}
-              defaultValue={field.default?.toString() || ""}
-              onChange={(event) => handleInputChange(event, key)}
-              className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
-            />
-          )}
-          <small className="mt-1">{field.description}</small>
+      {Object.entries(schema)
+        .sort(([, a], [, b]) => (a["x-order"] || 0) - (b["x-order"] || 0))
+        .map(([key, field]) => (
+          <div key={key} className="flex flex-col">
+            <label htmlFor={key} className="text-sm font-medium text-gray-700">
+              {key}
+            </label>
+            {["top", "bottom", "right", "left"].includes(key) ? (
+              <select
+                id={key}
+                name={key}
+                value={
+                  formData[key] !== undefined ? formData[key].toString() : ""
+                }
+                onChange={(event) => handleInputChange(event, key)}
+                className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              >
+                <option value="0">0</option>
+                <option value="256">256</option>
+                <option value="512">512</option>
+                <option value="768">768</option>
+              </select>
+            ) : field.type === "boolean" ? (
+              <select
+                id={key}
+                name={key}
+                value={
+                  formData[key] !== undefined ? formData[key].toString() : ""
+                }
+                onChange={(event) => handleBooleanInputChange(event, key)}
+                className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              >
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            ) : key === "image" || key === "input_image" ? (
+              <input
+                type="file"
+                key={resetKey}
+                id={key}
+                name={key}
+                onChange={(event) => handleFileChange(event, key)}
+                className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              />
+            ) : (
+              <input
+                type={field.type || "number"}
+                id={key}
+                name={key}
+                value={(formData[key] as string) || ""}
+                onChange={(event) => handleInputChange(event, key)}
+                className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              />
+            )}
+            <small className="mt-1">{field.description}</small>
+          </div>
+        ))}
+      <div className="flex gap-4">
+        <div
+          className="font-bold py-2 px-4 rounded border border-black"
+          onClick={handleReset}
+        >
+          Reset
         </div>
-      ))}
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Submit
-      </button>
+        <div className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button type="submit">Run</button>
+        </div>
+      </div>
     </form>
   );
 };

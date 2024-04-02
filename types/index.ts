@@ -9,5 +9,6 @@ export type InputSchema = {
     minimum?: number;
     allOf?: Array<{ $ref: string }>;
     //    x-order?: number;
+    "x-order": number;
   };
 };

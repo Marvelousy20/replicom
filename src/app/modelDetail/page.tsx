@@ -90,6 +90,8 @@ export default function ModelDetails() {
     setGlobalPredictions(null);
   };
 
+  console.log(modelDetails);
+
   return (
     <Suspense>
       <div className="flex flex-col items-center">
@@ -143,16 +145,6 @@ export default function ModelDetails() {
                 <div>
                   {globalPredictions.output && (
                     <div>
-                      {/* <Image
-                        fill
-                        src={`${
-                          globalPredictions.output[
-                            globalPredictions.output.length - 1
-                          ]
-                        }`}
-                        alt="output"
-                        sizes="100vw"
-                      /> */}
                       <Image
                         src={globalPredictions.output}
                         alt="image"
@@ -162,7 +154,7 @@ export default function ModelDetails() {
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    status: {globalPredictions.status} 
+                    status: {globalPredictions.status}
                     {globalPredictions.status !== "succeeded" ||
                       (globalPredictions.status === "failed" && <Loading />)}
                   </div>
