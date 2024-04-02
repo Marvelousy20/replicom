@@ -164,6 +164,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
   console.log("FORMDATA", formData);
 
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {Object.entries(schema)
@@ -201,12 +202,29 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
-            ) : key === "image" || key === "input_image" ? (
+            ) : key === "image" ||
+              key === "input_image" ||
+              key === "ref_image_path" ? (
               <input
                 type="file"
                 key={resetKey}
                 id={key}
                 name={key}
+                onChange={(event) => handleFileChange(event, key)}
+                className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              />
+            ) : key === "input_audio" ||
+              key === "audio" ||
+              key === "source_video_path" ||
+              key === "video_path" ||
+              key === "input_video" ||
+              key === "video" ? (
+              <input
+                type="file"
+                key={resetKey}
+                id={key}
+                name={key}
+                accept="audio/*" // Accepts all audio file types
                 onChange={(event) => handleFileChange(event, key)}
                 className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
               />
@@ -239,3 +257,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 };
 
 export default DynamicForm;
+
+
+
