@@ -273,7 +273,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             )}
             <div className="mt-1 opacity-60 text-[0.75rem]">
               <div>{field.description}</div>
-              <div>{field.default}</div>
+              <div>Default: {field.default}</div>
             </div>
           </div>
         ))}
