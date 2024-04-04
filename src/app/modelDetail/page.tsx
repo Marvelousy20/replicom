@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import DynamicForm from "@/components/DynamicForm";
 import { InputSchema } from "../../../types";
-import { usePredictionContext } from "@/coontext/prediction";
+import { usePredictionContext } from "@/context/prediction";
 import Loading from "@/components/Loading";
 
 interface Component {

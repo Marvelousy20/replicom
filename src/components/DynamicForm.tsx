@@ -1,8 +1,10 @@
 import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
 import { InputSchema } from "../../types";
-import { usePredictionContext } from "@/coontext/prediction";
+import { usePredictionContext } from "@/context/prediction";
 import FileUpload from "./FilesUpload";
 import { FileWithPath } from "react-dropzone";
+import { Slider } from "./ui/slider";
+import SliderWithInput from "./SliderWithInput";
 
 type FormData = {
   [key: string]: string | number | boolean;
@@ -197,7 +199,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
               {field.minimum ||
                 (field.maximum && (
                   <div className="opacity-50 text-sm">
-                    (Minimum: {field.minimum}, maximum: {field.maximum})
+                    (minimum: {field.minimum}, maximum: {field.maximum})
                   </div>
                 ))}
             </div>
@@ -260,6 +262,26 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                 value={(formData[key] as string) || ""}
                 onChange={(event) => handleInputChange(event, key)}
                 className="mt-1 px-2 py-2 block w-full border-black border  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none resize-none"
+              />
+            ) : field.minimum !== undefined || field.maximum !== undefined ? (
+              <SliderWithInput
+                min={field.minimum || 0}
+                max={field.maximum || 100}
+                inputKey={key}
+                onValueChange={(inputKey, value) => {
+                  console.log(
+                    `Updating form data for key ${inputKey} with value ${value}`
+                  );
+                  setFormData((prevFormData) => {
+                    const newFormData = { ...prevFormData };
+                    // Assuming `inputKey` is the key you're updating and `value` is the new value
+                    newFormData[inputKey] = value !== null ? value : ""; // Set to an empty string if value is null
+                    return newFormData;
+                  });
+                }}
+                defaultValue={
+                  typeof field.default === "number" ? field.default : 0
+                }
               />
             ) : (
               <input
