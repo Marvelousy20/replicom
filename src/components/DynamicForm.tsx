@@ -52,10 +52,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   const handleBooleanInputChange = (
-    event: ChangeEvent<HTMLSelectElement>,
+    event: ChangeEvent<HTMLInputElement>,
     key: string
   ) => {
-    const value = event.target.value === "true"; // Convert string "true" or "false" to boolean
+    // const value = event.target.value === "true";
+    const value = event.target.checked;
     setFormData({ ...formData, [key]: value });
   };
 
@@ -220,18 +221,29 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                 <option value="768">768</option>
               </select>
             ) : field.type === "boolean" ? (
-              <select
-                id={key}
-                name={key}
-                value={
-                  formData[key] !== undefined ? formData[key].toString() : ""
-                }
-                onChange={(event) => handleBooleanInputChange(event, key)}
-                className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
-              >
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
+              // <select
+              //   id={key}
+              //   name={key}
+              //   value={
+              //     formData[key] !== undefined ? formData[key].toString() : ""
+              //   }
+              //   onChange={(event) => handleBooleanInputChange(event, key)}
+              //   className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+              // >
+              //   <option value="true">Yes</option>
+              //   <option value="false">No</option>
+              // </select>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id={key}
+                  name={key}
+                  checked={formData[key] as boolean} // Cast to boolean since formData[key] is boolean
+                  onChange={(event) => handleBooleanInputChange(event, key)}
+                  // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                />
+                <div>{field.description}</div>
+              </div>
             ) : key === "input_audio" ||
               key === "audio" ||
               key === "source_video_path" ||
@@ -295,7 +307,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
             )}
             <div className="mt-1 opacity-60 text-[0.75rem]">
               <div>{field.description}</div>
-              <div>Default: {field.default}</div>
+              {field.default && <div>Default: {field.default}</div>}
             </div>
           </div>
         ))}
