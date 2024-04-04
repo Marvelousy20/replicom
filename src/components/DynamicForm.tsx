@@ -47,7 +47,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   ) => {
     let value: string | number = event.target.value;
 
-    value = parseInt(value, 10);
+    // value = parseInt(value, 10);
     setFormData({ ...formData, [key]: value });
   };
 
