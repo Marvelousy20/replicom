@@ -7,7 +7,7 @@ import { File } from "lucide-react";
 interface DropzoneProps {
   onDrop: (acceptedFiles: FileWithPath[]) => void;
   isRequired?: boolean;
-  previewUrl: string | null;
+  previewUrl?: string | null;
 }
 
 export default function FileUpload({
