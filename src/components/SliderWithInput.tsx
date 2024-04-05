@@ -9,6 +9,7 @@ interface SliderProps {
   min: number;
   inputKey: string;
   onValueChange: (inputKey: string, value: number | null) => void;
+  isRequired?: boolean;
 }
 
 const SliderWithInput = ({
@@ -17,6 +18,7 @@ const SliderWithInput = ({
   min,
   inputKey,
   onValueChange,
+  isRequired,
 }: SliderProps) => {
   const [sliderValue, setSliderValue] = useState<number | null>(defaultValue);
 
@@ -24,7 +26,6 @@ const SliderWithInput = ({
     const newValue = values[0];
     setSliderValue(newValue);
     onValueChange(inputKey, newValue);
-    console.log(newValue);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +47,7 @@ const SliderWithInput = ({
         name={inputKey}
         value={sliderValue !== null ? sliderValue : ""}
         onChange={handleInputChange}
+        required={isRequired}
         className="mt-1 px-2 py-2 block w-1/6 border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
       />
       <Slider

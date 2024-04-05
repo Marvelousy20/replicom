@@ -8,6 +8,7 @@ import DynamicForm from "@/components/DynamicForm";
 import { InputSchema } from "../../../types";
 import { usePredictionContext } from "@/context/prediction";
 import Loading from "@/components/Loading";
+import DynamicForms from "@/components/DynamicForms";
 
 interface Component {
   schemas: {
@@ -79,6 +80,10 @@ export default function ModelDetails() {
     (modelDetails as any)?.latest_version?.openapi_schema?.components?.schemas
       ?.Input?.properties || {};
 
+  const schemas =
+    (modelDetails as any)?.latest_version?.openapi_schema?.components
+      ?.schemas || {};
+
   if (!modelDetails) {
     return <div>Loading...</div>;
   }
@@ -130,8 +135,13 @@ export default function ModelDetails() {
 
               {/* Dynamic Input */}
               <div className="mt-10">
-                <DynamicForm
+                {/* <DynamicForm
                   schema={inputSchema}
+                  version={version}
+                  image={modelDetails.cover_image_url}
+                /> */}
+                <DynamicForms
+                  schema={schemas}
                   version={version}
                   image={modelDetails.cover_image_url}
                 />
