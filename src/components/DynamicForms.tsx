@@ -31,6 +31,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       field.default !== undefined ? field.default : "",
     ])
   );
+
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [prediction, setPrediction] = useState(null);
   const [error, setError] = useState(null);
@@ -61,22 +62,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     const value = event.target.checked;
     setFormData({ ...formData, [key]: value });
   };
-
-  // const handleFileChange = (
-  //   event: ChangeEvent<HTMLInputElement>,
-  //   key: string
-  // ) => {
-  //   if (event.target.files && event.target.files.length > 0) {
-  //     const file = event.target.files[0];
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       const base64String = reader.result as string;
-  //       // Update formData with the Base64 encoded string for the image
-  //       setFormData({ ...formData, [key]: base64String });
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
 
   const handleDrop = useCallback(
     (acceptedFiles: FileWithPath[], inputKey: string) => {
@@ -121,17 +106,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         sanitizedFormData[key] = value;
       }
     }
-    // const inputData = Object.fromEntries(
-    //   Object.entries(formData).map(([key, value]) => {
-    //     if (typeof value === "boolean") {
-    //       return [key, value];
-    //     }
-
-    //     const valueStr = typeof value === "number" ? value.toString() : value;
-
-    //     return [key, parseInt(valueStr, 10)];
-    //   })
-    // );
 
     console.log(sanitizedFormData);
 
@@ -182,10 +156,13 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setFormData(initialFormData);
     setResetKey((prevKey) => prevKey + 1);
   };
-
-  const handleReset = () => {
+  const handleReset = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault(); // Prevent form submission
     setFormData(initialFormData);
-    setResetKey((prevKey) => prevKey + 1);
+    // Reset other states if needed
+    setError(null);
+    setSelectedFiles({});
+    setResetKey((prevKey) => prevKey + 1); // This forces a re-render if needed
   };
 
   return (
@@ -302,6 +279,19 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     isRequired={isRequired}
                   />
                 </>
+              ) : field.type === "integer" ? (
+                <input
+                  type="number"
+                  id={key}
+                  name={key}
+                  value={(formData[key] as string) || ""}
+                  onChange={(event) => handleInputChange(event, key)}
+                  required={isRequired}
+                  className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                  min={field.minimum || undefined} // Optional: Set minimum value if defined
+                  max={field.maximum || undefined} // Optional: Set maximum value if defined
+                  step="1" // Ensure only whole numbers are allowed
+                />
               ) : (
                 <input
                   type={field.type || "number"}
@@ -325,7 +315,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       <div className="flex gap-4 justify-end">
         <div
           className="font-bold py-2 px-4 rounded border border-black"
-          onClick={handleReset}
+          onClick={(event) => handleReset(event)}
         >
           Reset
         </div>
