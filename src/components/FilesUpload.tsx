@@ -1,18 +1,24 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone, FileWithPath } from "react-dropzone";
 import { File } from "lucide-react";
 
 interface DropzoneProps {
   onDrop: (acceptedFiles: FileWithPath[]) => void;
   isRequired?: boolean;
+  previewUrl: string | null;
 }
 
-export default function FileUpload({ onDrop, isRequired }: DropzoneProps) {
+export default function FileUpload({
+  onDrop,
+  isRequired,
+  previewUrl,
+}: DropzoneProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
   });
+
   return (
     <div
       {...getRootProps()}
@@ -27,6 +33,15 @@ export default function FileUpload({ onDrop, isRequired }: DropzoneProps) {
           <p>Drop a file or click to upload</p>
         )}
       </div>
+      {previewUrl && (
+        <div className="mt-4">
+          <img
+            src={previewUrl}
+            alt="Uploaded file preview"
+            className="w-full h-auto"
+          />
+        </div>
+      )}
     </div>
   );
 }

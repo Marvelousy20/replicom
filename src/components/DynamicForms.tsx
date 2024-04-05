@@ -39,6 +39,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     {}
   );
   const [resetKey, setResetKey] = useState(0);
+  const [previewUrls, setPreviewUrls] = useState<{
+    [key: string]: string | null;
+  }>({});
 
   const { setGlobalPredictions } = usePredictionContext();
 
@@ -70,7 +73,10 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
         reader.onloadend = () => {
           const base64String = reader.result as string;
-
+          setPreviewUrls((prevPreviewUrls) => ({
+            ...prevPreviewUrls,
+            [inputKey]: base64String, // Update the specific preview URL
+          }));
           setFormData((prevFormData) => ({
             ...prevFormData,
             [inputKey]: base64String,
@@ -277,6 +283,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                   <FileUpload
                     onDrop={(acceptedFiles) => handleDrop(acceptedFiles, key)}
                     isRequired={isRequired}
+                    previewUrl={previewUrls[key] || null}
                   />
                 </>
               ) : field.type === "integer" ? (
