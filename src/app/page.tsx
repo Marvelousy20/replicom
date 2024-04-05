@@ -34,7 +34,7 @@ export default function Home() {
       <h1 className="text-4xl text-center font-bold mb-10">Public Models</h1>
 
       {models.length >= 1 && (
-        <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between">
+        <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
           {models.map((model, index) => {
             return (
               <div key={index}>

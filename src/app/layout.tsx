@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <PredictionContextProvider>
-        <body className={`${inter.className} p-8 lg:p-24 max-w-8xl mx-auto`}>
+        <body className={`${inter.className} py-4 lg:py-10 max-w-8xl mx-auto`}>
           {children}
         </body>
       </PredictionContextProvider>

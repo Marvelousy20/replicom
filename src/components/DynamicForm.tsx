@@ -5,6 +5,7 @@ import FileUpload from "./FilesUpload";
 import { FileWithPath } from "react-dropzone";
 import { Slider } from "./ui/slider";
 import SliderWithInput from "./SliderWithInput";
+import { Type, Hash } from "lucide-react";
 
 type FormData = {
   [key: string]: string | number | boolean;
@@ -188,6 +189,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
                   htmlFor={key}
                   className="text-sm font-medium text-gray-700"
                 >
+                  {field.type === "integer" ? (
+                    <Hash size={12} />
+                  ) : field.type === "string" ? (
+                    <Type size={12} />
+                  ) : null}
                   {key}
                 </label>
                 <div>

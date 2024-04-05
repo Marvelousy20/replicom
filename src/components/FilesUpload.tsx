@@ -6,15 +6,10 @@ import { File } from "lucide-react";
 
 interface DropzoneProps {
   onDrop: (acceptedFiles: FileWithPath[]) => void;
-  isRequired?: boolean;
   previewUrl?: string | null;
 }
 
-export default function FileUpload({
-  onDrop,
-  isRequired,
-  previewUrl,
-}: DropzoneProps) {
+export default function FileUpload({ onDrop, previewUrl }: DropzoneProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
   });
@@ -26,7 +21,7 @@ export default function FileUpload({
     >
       <div className="flex items-center gap-2">
         <File size={16} />
-        <input {...getInputProps()} required={isRequired} />
+        <input {...getInputProps()} />
         {isDragActive ? (
           <p>Drop the files here ...</p>
         ) : (

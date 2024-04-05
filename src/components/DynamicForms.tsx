@@ -5,9 +5,9 @@ import { InputSchema } from "../../types";
 import { usePredictionContext } from "@/context/prediction";
 import FileUpload from "./FilesUpload";
 import { FileWithPath } from "react-dropzone";
-import { Slider } from "./ui/slider";
 import SliderWithInput from "./SliderWithInput";
 import { MainSchema } from "../../types";
+import { Type, Hash, AlignJustify } from "lucide-react";
 
 type FormData = {
   [key: string]: string | number | boolean;
@@ -158,18 +158,49 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       setGlobalPredictions(prediction);
     }
     console.log("Prediction", prediction);
+    console.log("hello");
 
     setFormData(initialFormData);
     setResetKey((prevKey) => prevKey + 1);
   };
+
   const handleReset = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault(); // Prevent form submission
     setFormData(initialFormData);
     // Reset other states if needed
     setError(null);
     setSelectedFiles({});
+    setPreviewUrls({});
     setResetKey((prevKey) => prevKey + 1); // This forces a re-render if needed
   };
+
+  // Helper function to determine the type of a field
+  const getFieldType = (key: string, schema: MainSchema) => {
+    // First, check if the field has a type directly within the Input properties
+    const directType = schema.Input?.properties[key]?.type;
+    if (directType) {
+      return directType;
+    }
+
+    // If not found, check if the field is referenced elsewhere in the schema
+    const refKey = schema.Input?.properties[key]?.allOf?.[0]?.$ref
+      ?.split("/")
+      .pop();
+    if (refKey && schema[refKey]) {
+      return schema[refKey].type;
+    }
+
+    // If no type is found, return undefined or a default value
+
+    return undefined;
+  };
+
+  // Helper function to check if a key corresponds to an enumeration in the main schema
+  const isEnumeration = (key: string, schema: MainSchema) => {
+    return schema[key]?.enum !== undefined;
+  };
+
+  console.log(formData);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -180,13 +211,26 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           return (
             <div key={key} className="flex flex-col">
               <div className="flex justify-between">
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2 mb-1">
                   <label
                     htmlFor={key}
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
                   >
-                    {key}
-                    {isRequired && <span className="text-red-500">*</span>}
+                    <span>
+                      <span>
+                        {isEnumeration(key, schema) ? (
+                          <AlignJustify size={12} /> // Render the Justify icon if the field is an enumeration
+                        ) : getFieldType(key, schema) === "integer" ||
+                          getFieldType(key, schema) === "number" ? (
+                          <Hash size={12} />
+                        ) : getFieldType(key, schema) === "string" ? (
+                          <Type size={12} />
+                        ) : null}
+                      </span>
+                    </span>
+                    <span>{key}</span>
+
+                    {/* {isRequired && <span className="text-red-500">*</span>} */}
                   </label>
                   <div>
                     <div className="text-sm text-opacity-50 opacity-50">
@@ -211,8 +255,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                   onChange={(event) => handleInputChange(event, key)}
                   className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                 >
-                  {/* const refKey = field.allOf[0].$ref.split('/).pop() */}
-
                   {(() => {
                     const refKey = field.allOf[0].$ref.split("/").pop();
                     // Check if refKey is not undefined and if the schema and the referenced schema exist and have an enum property
@@ -250,7 +292,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                   min={field.minimum || 0}
                   max={field.maximum || 100}
                   inputKey={key}
-                  isRequired={isRequired}
+                  // isRequired={isRequired}
                   onValueChange={(inputKey, value) => {
                     setFormData((prevFormData) => {
                       const newFormData = { ...prevFormData };
@@ -282,7 +324,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
                   <FileUpload
                     onDrop={(acceptedFiles) => handleDrop(acceptedFiles, key)}
-                    isRequired={isRequired}
                     previewUrl={previewUrls[key] || null}
                   />
                 </>
@@ -327,7 +368,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           Reset
         </div>
         <div className="bg-black text-white font-bold py-2 px-4 rounded">
-          <button type="submit">Boot + Run</button>
+          <button type="submit">Boot + Runs</button>
         </div>
       </div>
     </form>

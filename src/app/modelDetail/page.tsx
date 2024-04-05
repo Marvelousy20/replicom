@@ -9,6 +9,7 @@ import { InputSchema } from "../../../types";
 import { usePredictionContext } from "@/context/prediction";
 import Loading from "@/components/Loading";
 import DynamicForms from "@/components/DynamicForms";
+import { ArrowLeft } from "lucide-react";
 
 interface Component {
   schemas: {
@@ -85,7 +86,7 @@ export default function ModelDetails() {
       ?.schemas || {};
 
   if (!modelDetails) {
-    return <div>Loading...</div>;
+    return <div className="px-4 lg:px-16">Loading...</div>;
   }
 
   const version = (modelDetails as any)?.latest_version?.id;
@@ -95,81 +96,71 @@ export default function ModelDetails() {
     setGlobalPredictions(null);
   };
 
-  console.log(modelDetails);
+  console.log(globalPredictions);
+  // console.log(schemas);
 
   return (
     <Suspense>
       <div className="flex flex-col items-center">
-        <div>
-          <div
-            className="mb-4 bg-blue-500 p-2 px-6 inline-flex rounded-md text-white"
-            onClick={handleBack}
-          >
-            Back
+        <div className="px-4 lg:px-16">
+          <div className="mb-4 inline-flex" onClick={handleBack}>
+            <ArrowLeft />
           </div>
           {/* Content */}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 mt-8 gap-10 justify-center flex-wrap">
-            {/* Output */}
-            <div className="!col-span-1">
-              <h2 className="mb-4 text-3xl">INPUT</h2>
-              {modelDetails.cover_image_url ? (
-                <Image
-                  src={modelDetails.cover_image_url}
-                  alt="img"
-                  width={700}
-                  height={400}
-                />
-              ) : (
-                <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
-              )}
-              <div className="flex items-center mt-4 gap-4">
-                <h1 className="text-3xl font-bold">{modelDetails.name}</h1>
-                <p className="text-lg font-bold"> {modelDetails.owner}</p>
-              </div>
-              <div>
-                <p className="text-[.75rem] break-words mt-1">
-                  {modelDetails.cover_image_url}
-                </p>
-              </div>
+          <div className="relative">
+            <div className="grid grid-cols-1 lg:grid-cols-2 mt-8 gap-10 justify-center flex-wrap border-t-2 h-full">
+              {/* Input */}
+              <div className="!col-span-1 mt-4">
+                <h2 className="mb-4 text-2xl">INPUT</h2>
+                {modelDetails.cover_image_url ? (
+                  <Image
+                    src={modelDetails.cover_image_url}
+                    alt="img"
+                    width={700}
+                    height={400}
+                  />
+                ) : (
+                  <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
+                )}
 
-              {/* Dynamic Input */}
-              <div className="mt-10">
-                {/* <DynamicForm
-                  schema={inputSchema}
-                  version={version}
-                  image={modelDetails.cover_image_url}
-                /> */}
-                <DynamicForms
-                  schema={schemas}
-                  version={version}
-                  image={modelDetails.cover_image_url}
-                />
-              </div>
-            </div>
-
-            {/* Input */}
-            <div className="col-span-1">
-              <h2 className="mb-4 text-3xl">OUTPUT</h2>
-              {globalPredictions && (
-                <div>
-                  {globalPredictions.output && (
-                    <div>
-                      <Image
-                        src={globalPredictions.output}
-                        alt="image"
-                        width={700}
-                        height={400}
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    status: {globalPredictions.status}
-                    {globalPredictions.status !== "succeeded" ||
-                      (globalPredictions.status === "failed" && <Loading />)}
-                  </div>
+                {/* Dynamic Input */}
+                <div className="mt-10">
+                  <DynamicForms
+                    schema={schemas}
+                    version={version}
+                    image={modelDetails.cover_image_url}
+                  />
                 </div>
-              )}
+              </div>
+
+              {/* Output */}
+              <div className="col-span-1 mt-4">
+                <h2 className="mb-4 text-2xl flex items-center gap-2">
+                  OUTPUT
+                  {globalPredictions?.status === "starting" ? (
+                    <Loading />
+                  ) : null}
+                </h2>
+                {globalPredictions && (
+                  <div>
+                    {globalPredictions.output && (
+                      <div>
+                        <Image
+                          src={globalPredictions.output}
+                          alt="image"
+                          width={700}
+                          height={400}
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      status: {globalPredictions.status}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="vertical-line lg:block hidden opacity-20"></div>
             </div>
           </div>
         </div>
