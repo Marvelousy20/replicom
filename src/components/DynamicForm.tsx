@@ -102,7 +102,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
 
         reader.readAsDataURL(file);
       });
-      console.log("hello");
     },
     []
   );

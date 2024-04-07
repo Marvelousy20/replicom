@@ -58,6 +58,7 @@ export default function ModelDetails() {
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
   const { globalPredictions, setGlobalPredictions } = usePredictionContext();
+  const [isCanceling, setIsCanceling] = useState(false);
 
   useEffect(() => {
     if (owner && name) {
@@ -96,8 +97,37 @@ export default function ModelDetails() {
     setGlobalPredictions(null);
   };
 
-  console.log(globalPredictions);
-  // console.log(schemas);
+  const cancelPrediction = async () => {
+    if (globalPredictions) {
+      const cancelUrl = globalPredictions?.urls?.cancel;
+      setIsCanceling(true);
+      try {
+        const response = await fetch(
+          `/api/model/?cancelUrl=${encodeURIComponent(cancelUrl)}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log(response);
+
+        const newResponse = await response.json();
+        if (response.status === 200) {
+          setGlobalPredictions(newResponse);
+          console.log(newResponse);
+        }
+      } catch (error) {
+        console.error("Error canceling prediction:", error);
+      } finally {
+        setIsCanceling(false);
+      }
+    }
+  };
+
+  console.log("PREDICTIONS", globalPredictions);
 
   return (
     <Suspense>
@@ -108,17 +138,21 @@ export default function ModelDetails() {
           </div>
           {/* Content */}
 
+          <p className="text-xl font-bold mt-4">{modelDetails.name}</p>
+          <p>{modelDetails.description}</p>
           <div className="relative">
-            <div className="grid grid-cols-1 lg:grid-cols-2 mt-8 gap-10 justify-center flex-wrap border-t-2 h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 mt-3 gap-10 justify-center flex-wrap border-t-2 h-full">
               {/* Input */}
-              <div className="!col-span-1 mt-4">
+              <div className="!col-span-1 mt-2">
                 <h2 className="mb-4 text-2xl">INPUT</h2>
+
                 {modelDetails.cover_image_url ? (
                   <Image
                     src={modelDetails.cover_image_url}
                     alt="img"
                     width={700}
                     height={400}
+                    priority
                   />
                 ) : (
                   <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
@@ -142,12 +176,23 @@ export default function ModelDetails() {
                     <Loading />
                   ) : null}
                 </h2>
-                {globalPredictions && (
+                {globalPredictions?.output && (
                   <div>
-                    {globalPredictions.output && (
+                    {Array.isArray(globalPredictions?.output) ? (
+                      globalPredictions.output.map((url, index) => (
+                        <div key={index}>
+                          <Image
+                            src={url}
+                            alt={`image ${index + 1}`}
+                            width={700}
+                            height={400}
+                          />
+                        </div>
+                      ))
+                    ) : (
                       <div>
                         <Image
-                          src={globalPredictions.output}
+                          src={globalPredictions?.output}
                           alt="image"
                           width={700}
                           height={400}
@@ -155,10 +200,29 @@ export default function ModelDetails() {
                       </div>
                     )}
                     <div className="flex items-center gap-2">
-                      status: {globalPredictions.status}
+                      predict_time: {globalPredictions?.metrics?.predict_time}
+                      seconds
                     </div>
                   </div>
                 )}
+
+                {globalPredictions?.id ? (
+                  <div>
+                    <div className="flex items-center gap-2">
+                      status: {globalPredictions?.status}
+                    </div>
+                  </div>
+                ) : null}
+
+                {globalPredictions?.status === "starting" ||
+                globalPredictions?.status === "processing" ? (
+                  <button
+                    className="bg-red-500 px-4 py-2 text-white mt-4"
+                    onClick={cancelPrediction}
+                  >
+                    {isCanceling ? <span>Canceling...</span> : "CANCEL"}
+                  </button>
+                ) : null}
               </div>
               <div className="vertical-line lg:block hidden opacity-20"></div>
             </div>

@@ -99,7 +99,10 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     const sanitizedFormData: FormData = {};
 
     for (const [key, value] of Object.entries(formData)) {
-      if (schema.Input.properties[key]?.type === "integer") {
+      if (
+        schema.Input.properties[key]?.type === "integer" ||
+        schema.Input.properties[key]?.allOf
+      ) {
         const intValue = parseInt(value as string, 10);
         if (!isNaN(intValue) && Number.isInteger(intValue)) {
           sanitizedFormData[key] = intValue;
@@ -144,7 +147,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
     while (
       prediction.status !== "succeeded" &&
-      prediction.status !== "failed"
+      prediction.status !== "failed" &&
+      prediction.status !== "canceled"
     ) {
       await sleep(1000);
       const response = await fetch(`/api/output?id=${predictionId}`);
@@ -158,10 +162,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       setGlobalPredictions(prediction);
     }
     console.log("Prediction", prediction);
-    console.log("hello");
 
-    setFormData(initialFormData);
-    setResetKey((prevKey) => prevKey + 1);
+    // setFormData(initialFormData);
+    // setResetKey((prevKey) => prevKey + 1);
   };
 
   const handleReset = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -200,7 +203,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     return schema[key]?.enum !== undefined;
   };
 
-  console.log(formData);
+  // console.log(formData);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -230,7 +233,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     </span>
                     <span>{key}</span>
 
-                    {/* {isRequired && <span className="text-red-500">*</span>} */}
+                    {isRequired && <span className="text-red-500">*</span>}
                   </label>
                   <div>
                     <div className="text-sm text-opacity-50 opacity-50">
@@ -311,6 +314,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                   id={key}
                   name={key}
                   value={(formData[key] as string) || ""}
+                  required={isRequired}
                   onChange={(event) => handleInputChange(event, key)}
                   className="mt-1 px-2 py-2 block w-full border-black border  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none resize-none"
                 />
