@@ -11,13 +11,14 @@ type globalPredictions = {
 type PredictionContextType = {
   globalPredictions: globalPredictions | null;
   setGlobalPredictions: React.Dispatch<React.SetStateAction<globalPredictions> | null>;
+  isCanceled: boolean;
+  setIsCanceled: (value: boolean) => void;
 };
 
 // Create a context with an initial state
-const PredictionContext = createContext<PredictionContextType>({
-  globalPredictions: {},
-  setGlobalPredictions: () => {},
-});
+const PredictionContext = createContext<PredictionContextType | undefined>(
+  undefined
+);
 
 // Create a provider component to wrap your app and provide the context
 export const PredictionContextProvider: React.FC<{ children: ReactNode }> = ({
@@ -25,16 +26,27 @@ export const PredictionContextProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [globalPredictions, setGlobalPredictions] =
     useState<globalPredictions | null>(null);
+  const [isCanceled, setIsCanceled] = useState(false);
 
   return (
     <PredictionContext.Provider
-      value={{ globalPredictions, setGlobalPredictions }}
+      value={{
+        globalPredictions,
+        setGlobalPredictions,
+        isCanceled,
+        setIsCanceled,
+      }}
     >
       {children}
     </PredictionContext.Provider>
   );
 };
-
-// Custom hook to easily access the context
-export const usePredictionContext = (): PredictionContextType =>
-  useContext(PredictionContext);
+export const usePredictionContext = (): PredictionContextType => {
+  const context = useContext(PredictionContext);
+  if (!context) {
+    throw new Error(
+      "usePredictionContext must be used within a PredictionContextProvider"
+    );
+  }
+  return context;
+};

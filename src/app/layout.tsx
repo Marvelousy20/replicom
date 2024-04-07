@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@mantine/core/styles.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 const inter = Inter({ subsets: ["latin"] });
 import { PredictionContextProvider } from "@/context/prediction";
@@ -19,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <PredictionContextProvider>
         <body className={`${inter.className} py-4 lg:py-10 max-w-8xl mx-auto`}>
-          {children}
+          <MantineProvider>{children}</MantineProvider>
         </body>
       </PredictionContextProvider>
     </html>

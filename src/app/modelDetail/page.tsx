@@ -10,6 +10,7 @@ import { usePredictionContext } from "@/context/prediction";
 import Loading from "@/components/Loading";
 import DynamicForms from "@/components/DynamicForms";
 import { ArrowLeft } from "lucide-react";
+import { Loader } from "@mantine/core";
 
 interface Component {
   schemas: {
@@ -57,7 +58,8 @@ export default function ModelDetails() {
   const owner = searchParams.get("owner");
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
-  const { globalPredictions, setGlobalPredictions } = usePredictionContext();
+  const { globalPredictions, setGlobalPredictions, setIsCanceled } =
+    usePredictionContext();
   const [isCanceling, setIsCanceling] = useState(false);
 
   useEffect(() => {
@@ -118,6 +120,7 @@ export default function ModelDetails() {
         if (response.status === 200) {
           setGlobalPredictions(newResponse);
           console.log(newResponse);
+          setIsCanceled(true);
         }
       } catch (error) {
         console.error("Error canceling prediction:", error);
@@ -217,10 +220,10 @@ export default function ModelDetails() {
                 {globalPredictions?.status === "starting" ||
                 globalPredictions?.status === "processing" ? (
                   <button
-                    className="bg-red-500 px-4 py-2 text-white mt-4"
+                    className="bg-red-500 w-[100px] h-[40px] text-white mt-4"
                     onClick={cancelPrediction}
                   >
-                    {isCanceling ? <span>Canceling...</span> : "CANCEL"}
+                    {isCanceling ? <Loader size={23} /> : "CANCEL"}
                   </button>
                 ) : null}
               </div>

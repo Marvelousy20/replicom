@@ -43,7 +43,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     [key: string]: string | null;
   }>({});
 
-  const { setGlobalPredictions } = usePredictionContext();
+  const { setGlobalPredictions, isCanceled } = usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<
@@ -148,7 +148,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     while (
       prediction.status !== "succeeded" &&
       prediction.status !== "failed" &&
-      prediction.status !== "canceled"
+      prediction.status !== "canceled" && !isCanceled
     ) {
       await sleep(1000);
       const response = await fetch(`/api/output?id=${predictionId}`);
@@ -371,7 +371,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         >
           Reset
         </div>
-        <div className="bg-black text-white font-bold py-2 px-4 rounded">
+        <div className="bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70">
           <button type="submit">Boot + Runs</button>
         </div>
       </div>
