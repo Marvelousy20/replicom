@@ -148,6 +148,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       });
 
       let predictionData = await response.json();
+
+      console.log("PREDICTIONDATA inside form", predictionData);
       if (response.status !== 200) {
         setError(predictionData.detail);
         return;
@@ -158,6 +160,10 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         return;
       }
 
+      if (predictionData.status !== 200) {
+        alert(predictionData.detail);
+        return;
+      }
       // Set the new prediction. This will trigger the useEffect hook that handles polling.
       setPrediction(predictionData);
 
@@ -168,6 +174,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       }
 
       // start polling
+
       const poll = async (id: string) => {
         try {
           const pollResponse = await fetch(`/api/output?id=${id}`);
