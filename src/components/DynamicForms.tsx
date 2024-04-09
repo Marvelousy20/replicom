@@ -50,7 +50,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   }>({});
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { setPrediction } = usePredictionContext();
+  const { setPrediction, prediction } = usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<
@@ -101,6 +101,15 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     []
   );
 
+  useEffect(() => {
+    if (prediction?.status === "canceled" && pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current); // Clear interval if prediction is canceled
+      pollIntervalRef.current = null; // Reset the ref after clearing  the interval
+    }
+  }, [prediction?.status]);
+
+  console.log("PREDICTION INSIDE DYNAMIC FORM", prediction);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const sanitizedFormData: FormData = {};
@@ -149,7 +158,14 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         return;
       }
 
+      // Set the new prediction. This will trigger the useEffect hook that handles polling.
       setPrediction(predictionData);
+
+      // If there's an existing polling interval from a previous prediction, clear it before starting a new one
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null; // Reset the ref after clearing the interval
+      }
 
       // start polling
       const poll = async (id: string) => {
@@ -242,15 +258,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   const isEnumeration = (key: string, schema: MainSchema) => {
     return schema[key]?.enum !== undefined;
   };
-
-  useEffect(() => {
-    return () => {
-      // Clear polling when component unmounts or when cancel is successful
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
