@@ -73,6 +73,7 @@ export interface Prediction {
   metrics?: PredictionMetrics;
   output: string | string[];
   created_at: string;
+  error: string;
 }
 
 interface PredictionContextType {

@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import ModelItem from "@/components/ModelItem";
+import { useRouter } from "next/navigation";
+import { usePredictionContext } from "@/context/prediction";
 
 interface ModelProps {
   cover_image_url: string;
@@ -18,7 +20,7 @@ interface AllModels {
 export default function Home() {
   const [models, setModels] = useState<ModelProps[] | []>([]);
   const [allModels, setAllModels] = useState<AllModels | null>(null);
-  // In your component
+
   const getModels = async () => {
     try {
       const response = await fetch("/api");
@@ -44,6 +46,16 @@ export default function Home() {
   useEffect(() => {
     getModels();
   }, []);
+
+  const { setPrediction } = usePredictionContext();
+
+  useEffect(() => {
+    // This cleanup function runs when the component unmounts
+    return () => {
+      // Reset the prediction state when navigating away from this page
+      setPrediction(null);
+    };
+  }, [setPrediction]);
 
   console.log(allModels);
   return (

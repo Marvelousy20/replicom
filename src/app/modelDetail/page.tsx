@@ -310,6 +310,14 @@ export default function ModelDetails() {
                     </span>
                   )}
                 </div>
+
+                <div className="mt-1">
+                  {prediction?.status === "failed" && (
+                    <span>
+                     Error: {prediction.error}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="vertical-line lg:block hidden opacity-20"></div>
             </div>
