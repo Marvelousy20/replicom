@@ -1,8 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import ModelItem from "@/components/ModelItem";
-import { useRouter } from "next/navigation";
 import { usePredictionContext } from "@/context/prediction";
 
 interface ModelProps {
@@ -20,12 +18,14 @@ interface AllModels {
 export default function Home() {
   const [models, setModels] = useState<ModelProps[] | []>([]);
   const [allModels, setAllModels] = useState<AllModels | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getModels = async () => {
     try {
       const response = await fetch("/api");
       const result = await response.json();
       setModels(result.results);
+      // This includes the all the data including the next and previous links.
       setAllModels(result);
     } catch (error) {
       console.error(error);
@@ -50,22 +50,36 @@ export default function Home() {
   const { setPrediction } = usePredictionContext();
 
   useEffect(() => {
-    // This cleanup function runs when the component unmounts
     return () => {
       // Reset the prediction state when navigating away from this page
       setPrediction(null);
     };
   }, [setPrediction]);
 
-  console.log(allModels);
+  console.log("ALL MODELS", allModels);
+  console.log("MODELS", models);
+
+  // Filter all models
+  const filteredModels = models.filter((model) =>
+    model?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <main className="">
-      <h1 className="text-4xl text-center font-bold mb-10">Public Models</h1>
+      <div className="md:px-10 px-5 flex items-center justify-between mb-10">
+        <h1 className="text-4xl text-center font-bold">Public Models</h1>
+        <input
+          type="text"
+          placeholder="Search models..."
+          className="px-2 py-3 outline-none border w-2/6 rounded-sm"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
+        />
+      </div>
 
       {models.length >= 1 && (
         <div>
           <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
-            {models.map((model, index) => {
+            {/* {models.map((model, index) => {
               return (
                 <div key={index}>
                   <ModelItem
@@ -75,13 +89,28 @@ export default function Home() {
                   />
                 </div>
               );
-            })}
+            })} */}
+            {filteredModels.length > 0 ? (
+              <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
+                {filteredModels.map((model, index) => (
+                  <div key={index}>
+                    <ModelItem
+                      cover_image_url={model.cover_image_url}
+                      name={model.name}
+                      owner={model.owner}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center">No models found.</p>
+            )}
           </div>
           <div
             className="text-white mt-20 font-bold flex justify-center"
             onClick={handleNextClick}
           >
-            {allModels?.next ? (
+            {allModels?.next && filteredModels.length > 0 ? (
               <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4">
                 View More
               </button>
