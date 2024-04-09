@@ -65,10 +65,13 @@ export default function Home() {
               );
             })}
           </div>
-          <div className="text-white mt-20 font-bold flex justify-center" onClick={handleNextClick}>
+          <div
+            className="text-white mt-20 font-bold flex justify-center"
+            onClick={handleNextClick}
+          >
             {allModels?.next ? (
               <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4">
-                Next
+                View More
               </button>
             ) : null}
           </div>
