@@ -54,18 +54,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const cancelUrl = searchParams.get("cancelUrl");
+  const id = searchParams.get("id");
 
-  console.log("cancelUrl", cancelUrl);
-  if (cancelUrl) {
+  console.log("PredictionId", id);
+  if (id) {
     try {
-      const response = await fetch(cancelUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `https://api.replicate.com/v1/predictions/${id}/cancel`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const data = await response.json();
       return Response.json(data);
       // return res.json(data);

@@ -11,41 +11,67 @@ interface ModelProps {
   description: string;
 }
 
+interface AllModels {
+  next: string;
+}
+
 export default function Home() {
   const [models, setModels] = useState<ModelProps[] | []>([]);
+  const [allModels, setAllModels] = useState<AllModels | null>(null);
   // In your component
   const getModels = async () => {
     try {
       const response = await fetch("/api");
       const result = await response.json();
       setModels(result.results);
+      setAllModels(result);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleNextClick = async () => {
+    if (allModels?.next) {
+      const response = await fetch(
+        `/api?url=${encodeURIComponent(allModels.next)}`
+      );
+      const result = await response.json();
+      setModels((prevModels) => [...prevModels, ...result.results]);
+      setAllModels(result);
     }
   };
 
   useEffect(() => {
     getModels();
   }, []);
+
+  console.log(allModels);
   return (
     <main className="">
-      {/* Get all model */}
-
       <h1 className="text-4xl text-center font-bold mb-10">Public Models</h1>
 
       {models.length >= 1 && (
-        <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
-          {models.map((model, index) => {
-            return (
-              <div key={index}>
-                <ModelItem
-                  cover_image_url={model.cover_image_url}
-                  name={model.name}
-                  owner={model.owner}
-                />
-              </div>
-            );
-          })}
+        <div>
+          <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
+            {models.map((model, index) => {
+              return (
+                <div key={index}>
+                  <ModelItem
+                    cover_image_url={model.cover_image_url}
+                    name={model.name}
+                    owner={model.owner}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-white mt-20 font-bold flex justify-center" onClick={handleNextClick}>
+            {allModels?.next ? (
+              <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4">
+                Next
+              </button>
+            ) : null}
+          </div>
         </div>
       )}
     </main>

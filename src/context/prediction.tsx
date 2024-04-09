@@ -1,51 +1,118 @@
+// "use client";
+
+// import React, {
+//   createContext,
+//   useState,
+//   useContext,
+//   ReactNode,
+//   useRef,
+//   useEffect,
+// } from "react";
+
+// // Define the type for the object state
+// type globalPredictions = {
+//   [key: string]: any; // You can replace 'any' with the specific type of your object's values
+// };
+// // Define the type for the cancellation token
+
+// // Define the type for the context
+// type PredictionContextType = {
+//   globalPredictions: globalPredictions | null;
+//   setGlobalPredictions: React.Dispatch<React.SetStateAction<globalPredictions> | null>;
+//   isPredictionCanceled: boolean;
+//   setIsPredictionCanceled: React.Dispatch<React.SetStateAction<boolean>>;
+// };
+
+// // Create a context with an initial state
+// const PredictionContext = createContext<PredictionContextType | undefined>(
+//   undefined
+// );
+
+// // Create a provider component to wrap your app and provide the context
+// export const PredictionContextProvider: React.FC<{ children: ReactNode }> = ({
+//   children,
+// }) => {
+//   const [globalPredictions, setGlobalPredictions] =
+//     useState<globalPredictions | null>(null);
+//   const [isPredictionCanceled, setIsPredictionCanceled] = useState(false);
+
+//   return (
+//     <PredictionContext.Provider
+//       value={{
+//         globalPredictions,
+//         setGlobalPredictions,
+//         isPredictionCanceled,
+//         setIsPredictionCanceled,
+//       }}
+//     >
+//       {children}
+//     </PredictionContext.Provider>
+//   );
+// };
+// export const usePredictionContext = (): PredictionContextType => {
+//   const context = useContext(PredictionContext);
+//   if (!context) {
+//     throw new Error(
+//       "usePredictionContext must be used within a PredictionContextProvider"
+//     );
+//   }
+//   return context;
+// };
+
 "use client";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
-import React, { createContext, useState, useContext, ReactNode } from "react";
+interface PredictionMetrics {
+  predict_time: number;
+  total_time: number;
+}
 
-// Define the type for the object state
-type globalPredictions = {
-  [key: string]: any; // You can replace 'any' with the specific type of your object's values
-};
+export interface Prediction {
+  id: string;
+  status: "starting" | "processing" | "canceled" | "succeeded" | "failed";
+  metrics?: PredictionMetrics;
+  output: string | string[];
+  created_at: string;
+}
 
-// Define the type for the context
-type PredictionContextType = {
-  globalPredictions: globalPredictions | null;
-  setGlobalPredictions: React.Dispatch<React.SetStateAction<globalPredictions> | null>;
-  isCanceled: boolean;
-  setIsCanceled: (value: boolean) => void;
-};
+interface PredictionContextType {
+  prediction: Prediction | null;
+  updatePrediction: (newPrediction: Prediction) => void;
+  clearPrediction: () => void;
+  setPrediction: React.Dispatch<React.SetStateAction<Prediction | null>>;
+}
 
-// Create a context with an initial state
 const PredictionContext = createContext<PredictionContextType | undefined>(
   undefined
 );
 
-// Create a provider component to wrap your app and provide the context
-export const PredictionContextProvider: React.FC<{ children: ReactNode }> = ({
+export const PredictionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [globalPredictions, setGlobalPredictions] =
-    useState<globalPredictions | null>(null);
-  const [isCanceled, setIsCanceled] = useState(false);
+  const [prediction, setPrediction] = useState<Prediction | null>(null);
+
+  const updatePrediction = (newPrediction: Prediction) => {
+    setPrediction(newPrediction);
+  };
+
+  const clearPrediction = () => {
+    setPrediction(null);
+  };
 
   return (
     <PredictionContext.Provider
-      value={{
-        globalPredictions,
-        setGlobalPredictions,
-        isCanceled,
-        setIsCanceled,
-      }}
+      value={{ prediction, updatePrediction, clearPrediction, setPrediction }}
     >
       {children}
     </PredictionContext.Provider>
   );
 };
-export const usePredictionContext = (): PredictionContextType => {
+
+export const usePredictionContext = () => {
   const context = useContext(PredictionContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error(
-      "usePredictionContext must be used within a PredictionContextProvider"
+      "usePredictionContext must be used within a PredictionProvider"
     );
   }
   return context;

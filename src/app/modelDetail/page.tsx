@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Suspense } from "react";
@@ -11,6 +11,7 @@ import Loading from "@/components/Loading";
 import DynamicForms from "@/components/DynamicForms";
 import { ArrowLeft } from "lucide-react";
 import { Loader } from "@mantine/core";
+import { formatTimestamp } from "@/lib/utils";
 
 interface Component {
   schemas: {
@@ -58,8 +59,10 @@ export default function ModelDetails() {
   const owner = searchParams.get("owner");
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
-  const { globalPredictions, setGlobalPredictions, setIsCanceled } =
-    usePredictionContext();
+  // const { prediction, setGlobalPredictions, setIsPredictionCanceled } =
+  //   usePredictionContext();
+
+  const { prediction, setPrediction } = usePredictionContext();
   const [isCanceling, setIsCanceling] = useState(false);
 
   useEffect(() => {
@@ -95,42 +98,67 @@ export default function ModelDetails() {
   const version = (modelDetails as any)?.latest_version?.id;
 
   const handleBack = () => {
+    setPrediction(null);
     router.back();
-    setGlobalPredictions(null);
   };
 
   const cancelPrediction = async () => {
-    if (globalPredictions) {
-      const cancelUrl = globalPredictions?.urls?.cancel;
+    if (
+      prediction &&
+      (prediction.status === "starting" || prediction.status === "processing")
+    ) {
       setIsCanceling(true);
       try {
-        const response = await fetch(
-          `/api/model/?cancelUrl=${encodeURIComponent(cancelUrl)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+        const response = await fetch(`/api/model?id=${prediction.id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error("Network response was not ok.");
+
+        const canceledPrediction = await response.json();
+        setPrediction(canceledPrediction);
+        console.log(
+          "CANCELELED PREDICTION INSIDEMODEL DETAILS",
+          canceledPrediction
         );
-
-        console.log(response);
-
-        const newResponse = await response.json();
-        if (response.status === 200) {
-          setGlobalPredictions(newResponse);
-          console.log(newResponse);
-          setIsCanceled(true);
-        }
+        console.log("PREDICTION INSIDE MODEL DETAIL", prediction);
       } catch (error) {
         console.error("Error canceling prediction:", error);
       } finally {
         setIsCanceling(false);
       }
     }
-  };
+    // if (prediction) {
+    //   const predictionId = prediction?.id;
+    //   setIsCanceling(true);
+    //   try {
+    //     const response = await fetch(
+    //       `/api/model/?id=${encodeURIComponent(predictionId)}`,
+    //       {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //       }
+    //     );
 
-  console.log("PREDICTIONS", globalPredictions);
+    //     if (response.status === 200) {
+    //       const newResponse = await response.json();
+    //       setGlobalPredictions(newResponse);
+    //       setIsPredictionCanceled(true);
+    //       console.log("NEW PREDICTION IN PAGE", newResponse);
+    //       console.log("GLOBAL PREDICTION IN PAGE", prediction);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error canceling prediction:", error);
+    //   } finally {
+    //     setIsCanceling(false);
+    //   }
+    // }
+  };
 
   return (
     <Suspense>
@@ -175,57 +203,113 @@ export default function ModelDetails() {
               <div className="col-span-1 mt-4">
                 <h2 className="mb-4 text-2xl flex items-center gap-2">
                   OUTPUT
-                  {globalPredictions?.status === "starting" ? (
-                    <Loading />
-                  ) : null}
+                  {prediction?.status === "starting" ? <Loading /> : null}
                 </h2>
-                {globalPredictions?.output && (
+                {prediction?.output && (
                   <div>
-                    {Array.isArray(globalPredictions?.output) ? (
-                      globalPredictions.output.map((url, index) => (
+                    {Array.isArray(prediction?.output) ? (
+                      prediction.output.map((url, index) => (
                         <div key={index}>
-                          <Image
-                            src={url}
-                            alt={`image ${index + 1}`}
-                            width={700}
-                            height={400}
-                          />
+                          {url.endsWith(".mp4") ||
+                          url.endsWith(".webm") ||
+                          url.endsWith(".ogg") ? (
+                            // Render a video element if the URL ends with a video file extension
+                            <video controls width="700" height="400">
+                              <source src={url} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          ) : url.endsWith(".mp3") ||
+                            url.endsWith(".wav") ||
+                            url.endsWith(".ogg") ? (
+                            // Render an audio element if the URL ends with an audio file extension
+                            <audio controls>
+                              <source src={url} type="audio/mpeg" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          ) : (
+                            // Render an image element otherwise
+                            <Image
+                              src={url}
+                              alt={`image ${index + 1}`}
+                              width={700}
+                              height={400}
+                            />
+                          )}
                         </div>
                       ))
                     ) : (
                       <div>
-                        <Image
-                          src={globalPredictions?.output}
-                          alt="image"
-                          width={700}
-                          height={400}
-                        />
+                        {prediction.output.endsWith(".mp4") ||
+                        prediction.output.endsWith(".webm") ||
+                        prediction.output.endsWith(".ogg") ? (
+                          // Render a video element if the URL ends with a video file extension
+                          <video controls width="700" height="400">
+                            <source src={prediction.output} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : prediction.output.endsWith(".mp3") ||
+                          prediction.output.endsWith(".wav") ||
+                          prediction.output.endsWith(".ogg") ? (
+                          // Render an audio element if the URL ends with an audio file extension
+                          <audio controls>
+                            <source src={prediction.output} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                          </audio>
+                        ) : (
+                          // Render an image element otherwise
+                          <Image
+                            src={prediction.output}
+                            alt="image"
+                            width={700}
+                            height={400}
+                          />
+                        )}
                       </div>
                     )}
-                    <div className="flex items-center gap-2">
-                      predict_time: {globalPredictions?.metrics?.predict_time}
-                      seconds
+                    <div className="flex items-center gap-2 mt-4">
+                      predict_time: {prediction?.metrics?.predict_time} seconds
                     </div>
                   </div>
                 )}
 
-                {globalPredictions?.id ? (
+                {prediction?.id ? (
                   <div>
                     <div className="flex items-center gap-2">
-                      status: {globalPredictions?.status}
+                      status: {prediction?.status}
                     </div>
                   </div>
                 ) : null}
 
-                {globalPredictions?.status === "starting" ||
-                globalPredictions?.status === "processing" ? (
-                  <button
-                    className="bg-red-500 w-[100px] h-[40px] text-white mt-4"
-                    onClick={cancelPrediction}
-                  >
-                    {isCanceling ? <Loader size={23} /> : "CANCEL"}
-                  </button>
-                ) : null}
+                {prediction &&
+                  (prediction?.status === "starting" ||
+                    prediction?.status === "processing") && (
+                    <button
+                      className="bg-red-500 w-[100px] h-[40px] flex items-center justify-center text-white mt-4"
+                      onClick={cancelPrediction}
+                    >
+                      {isCanceling ? <Loader size={23} /> : "CANCEL"}
+                    </button>
+                  )}
+
+                {/* {prediction &&
+                  (prediction.status === "starting" ||
+                    prediction.status === "processing") && (
+                    <button
+                      onClick={cancelPrediction}
+                      className="cancel-button"
+                    >
+                      Cancel Prediction
+                    </button>
+                  )} */}
+                <div className="mt-1">
+                  {prediction?.output && (
+                    <span>
+                      Date:
+                      {formatTimestamp(prediction?.created_at).date}, Time:
+                      {formatTimestamp(prediction?.created_at).time}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="vertical-line lg:block hidden opacity-20"></div>
             </div>

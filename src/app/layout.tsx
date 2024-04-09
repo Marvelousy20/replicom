@@ -5,7 +5,7 @@ import "@mantine/core/styles.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 const inter = Inter({ subsets: ["latin"] });
-import { PredictionContextProvider } from "@/context/prediction";
+import { PredictionProvider } from "@/context/prediction";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,11 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <PredictionContextProvider>
+      <PredictionProvider>
         <body className={`${inter.className} py-4 lg:py-10 max-w-8xl mx-auto`}>
           <MantineProvider>{children}</MantineProvider>
         </body>
-      </PredictionContextProvider>
+      </PredictionProvider>
     </html>
   );
 }

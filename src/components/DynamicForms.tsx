@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, ChangeEvent, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import { InputSchema } from "../../types";
-import { usePredictionContext } from "@/context/prediction";
+import { Prediction, usePredictionContext } from "@/context/prediction";
 import FileUpload from "./FilesUpload";
 import { FileWithPath } from "react-dropzone";
 import SliderWithInput from "./SliderWithInput";
@@ -33,7 +39,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   );
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [prediction, setPrediction] = useState(null);
+  // const [predictions, setPrediction] = useState(null);
   const [error, setError] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string }>(
     {}
@@ -42,8 +48,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   const [previewUrls, setPreviewUrls] = useState<{
     [key: string]: string | null;
   }>({});
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { setGlobalPredictions, isCanceled } = usePredictionContext();
+  const { setPrediction } = usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<
@@ -101,7 +108,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     for (const [key, value] of Object.entries(formData)) {
       if (
         schema.Input.properties[key]?.type === "integer" ||
-        schema.Input.properties[key]?.allOf
+        schema.Input.properties[key]?.allOf ||
+        schema.Input.properties[key]?.type === "number"
       ) {
         const intValue = parseInt(value as string, 10);
         if (!isNaN(intValue) && Number.isInteger(intValue)) {
@@ -109,7 +117,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         } else {
           // Handle the case where the value is not a valid integer
           console.error(`Invalid integer value for ${key}: ${value}`);
-          // You might want to set a default value or handle this case differently
         }
       } else {
         sanitizedFormData[key] = value;
@@ -121,50 +128,81 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     const requestBody = { version, input: sanitizedFormData };
 
     console.log("SENT TO BACKEND", requestBody);
-    const response = await fetch("/api/output", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
 
-    let prediction = await response.json();
-    if (response.status !== 200) {
-      setError(prediction.detail);
-      return;
-    }
-    setPrediction(prediction);
+    try {
+      const response = await fetch("/api/output", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-    if (prediction.status === 422) {
-      console.error("Prediction error:", prediction.detail);
-      alert(`Prediction Error: ${prediction.detail}`);
-      return;
-    }
-
-    const predictionId = prediction.id;
-    console.log(prediction);
-
-    while (
-      prediction.status !== "succeeded" &&
-      prediction.status !== "failed" &&
-      prediction.status !== "canceled" && !isCanceled
-    ) {
-      await sleep(1000);
-      const response = await fetch(`/api/output?id=${predictionId}`);
-      prediction = await response.json();
+      let predictionData = await response.json();
       if (response.status !== 200) {
-        setError(prediction.detail);
+        setError(predictionData.detail);
+        return;
+      }
+      if (predictionData.status === 422) {
+        console.error("Prediction error:", predictionData.detail);
+        alert(`Prediction Error: ${predictionData.detail}`);
         return;
       }
 
-      setPrediction(prediction);
-      setGlobalPredictions(prediction);
-    }
-    console.log("Prediction", prediction);
+      setPrediction(predictionData);
 
-    // setFormData(initialFormData);
-    // setResetKey((prevKey) => prevKey + 1);
+      // start polling
+      const poll = async (id: string) => {
+        try {
+          const pollResponse = await fetch(`/api/output?id=${id}`);
+          const updatedPrediction = await pollResponse.json();
+          setPrediction(updatedPrediction);
+
+          if (
+            ["succeeded", "failed", "canceled"].includes(
+              updatedPrediction.status
+            )
+          ) {
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+            }
+          }
+        } catch (pollError) {
+          console.error("Polling error:", pollError);
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+          }
+        }
+      };
+
+      pollIntervalRef.current = setInterval(
+        () => poll(predictionData.id),
+        3000
+      ); // Store interval ID in ref
+    } catch (error) {
+      console.error(error);
+    }
+
+    // const predictionId = predictionData.id;
+
+    // while (
+    //   prediction.status !== "succeeded" &&
+    //   prediction.status !== "failed" &&
+    //   prediction.status !== "canceled"
+    // ) {
+    //   await sleep(3000);
+    //   const response = await fetch(`/api/output?id=${predictionId}`);
+    //   prediction = await response.json();
+    //   if (response.status !== 200) {
+    //     setError(prediction.detail);
+    //     return;
+    //   }
+    //   setPrediction(prediction);
+    //   const data: Prediction = await response.json();
+    //   updatePrediction(data);
+    //   // setGlobalPredictions(prediction);
+    //   // console.log("GLOBAL PREDICTION IN FORM", globalPredictions);
+    // }
   };
 
   const handleReset = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -176,6 +214,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setPreviewUrls({});
     setResetKey((prevKey) => prevKey + 1); // This forces a re-render if needed
   };
+
+  // console.log("GLOBAL PREDICTION OUTSIDE SUBMIT FORM", globalPredictions);
 
   // Helper function to determine the type of a field
   const getFieldType = (key: string, schema: MainSchema) => {
@@ -203,7 +243,14 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     return schema[key]?.enum !== undefined;
   };
 
-  // console.log(formData);
+  useEffect(() => {
+    return () => {
+      // Clear polling when component unmounts or when cancel is successful
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -366,7 +413,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         })}
       <div className="flex gap-4 justify-end">
         <div
-          className="font-bold py-2 px-4 rounded border border-black"
+          className="font-bold py-2 px-4 rounded border border-black cursor-pointer"
           onClick={(event) => handleReset(event)}
         >
           Reset
