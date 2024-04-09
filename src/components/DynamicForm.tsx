@@ -38,7 +38,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   );
   const [resetKey, setResetKey] = useState(0);
 
-  const { setGlobalPredictions } = usePredictionContext();
+  // const { setGlobalPredictions } = usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<
@@ -161,7 +161,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
       }
 
       setPrediction(prediction);
-      setGlobalPredictions(prediction);
+      // setGlobalPredictions(prediction);
     }
     console.log("Prediction", prediction);
 
