@@ -78,9 +78,11 @@ export interface Prediction {
 
 interface PredictionContextType {
   prediction: Prediction | null;
-  updatePrediction: (newPrediction: Prediction) => void;
-  clearPrediction: () => void;
+  // updatePrediction: (newPrediction: Prediction) => void;
+  // clearPrediction: () => void;
   setPrediction: React.Dispatch<React.SetStateAction<Prediction | null>>;
+  showInitialImage: boolean;
+  setShowInitialImage: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PredictionContext = createContext<PredictionContextType | undefined>(
@@ -91,6 +93,7 @@ export const PredictionProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [showInitialImage, setShowInitialImage] = useState(true);
 
   const updatePrediction = (newPrediction: Prediction) => {
     setPrediction(newPrediction);
@@ -102,7 +105,12 @@ export const PredictionProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <PredictionContext.Provider
-      value={{ prediction, updatePrediction, clearPrediction, setPrediction }}
+      value={{
+        prediction,
+        setPrediction,
+        showInitialImage,
+        setShowInitialImage,
+      }}
     >
       {children}
     </PredictionContext.Provider>

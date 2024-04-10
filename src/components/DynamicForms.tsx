@@ -50,7 +50,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   }>({});
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { setPrediction, prediction } = usePredictionContext();
+  const { setPrediction, prediction, setShowInitialImage } =
+    usePredictionContext();
 
   const handleInputChange = (
     event: ChangeEvent<
@@ -112,6 +113,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setShowInitialImage(false);
     const sanitizedFormData: FormData = {};
 
     for (const [key, value] of Object.entries(formData)) {
@@ -160,7 +162,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         return;
       }
 
-      if (predictionData.status !== 200) {
+      if (predictionData.status === 402) {
+        console.log(predictionData);
         alert(predictionData.detail);
         return;
       }
@@ -267,7 +270,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8 relative">
       {Object.entries(schema.Input?.properties)
         .sort(([, a], [, b]) => (a["x-order"] || 0) - (b["x-order"] || 0))
         .map(([key, field]) => {
@@ -317,7 +320,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     formData[key] !== undefined ? formData[key].toString() : ""
                   }
                   onChange={(event) => handleInputChange(event, key)}
-                  className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                  className="mt-1 px-2 py-2 block w-full rounded-md border w-full border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                 >
                   {(() => {
                     const refKey = field.allOf[0].$ref.split("/").pop();
@@ -425,15 +428,18 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
             </div>
           );
         })}
-      <div className="flex gap-4 justify-end">
-        <div
-          className="font-bold py-2 px-4 rounded border border-black cursor-pointer"
-          onClick={(event) => handleReset(event)}
-        >
-          Reset
-        </div>
-        <div className="bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70">
-          <button type="submit">Boot + Runs</button>
+
+      <div className="sticky bottom-0">
+        <div className="flex gap-4 justify-end">
+          <div
+            className="font-bold py-2 px-4 rounded border border-black cursor-pointer"
+            onClick={(event) => handleReset(event)}
+          >
+            Reset
+          </div>
+          <div className="bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70">
+            <button type="submit">Boot + Runs</button>
+          </div>
         </div>
       </div>
     </form>

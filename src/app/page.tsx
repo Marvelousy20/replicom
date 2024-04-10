@@ -111,7 +111,7 @@ export default function Home() {
             onClick={handleNextClick}
           >
             {allModels?.next && filteredModels.length > 0 ? (
-              <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4">
+              <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4 rounded-sm ease-in-out transition-all duration-300">
                 View More
               </button>
             ) : null}

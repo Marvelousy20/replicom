@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Suspense } from "react";
-import DynamicForm from "@/components/DynamicForm";
 import { InputSchema } from "../../../types";
 import { usePredictionContext } from "@/context/prediction";
 import Loading from "@/components/Loading";
@@ -62,7 +61,8 @@ export default function ModelDetails() {
   // const { prediction, setGlobalPredictions, setIsPredictionCanceled } =
   //   usePredictionContext();
 
-  const { prediction, setPrediction } = usePredictionContext();
+  const { prediction, setPrediction, showInitialImage } =
+    usePredictionContext();
   const [isCanceling, setIsCanceling] = useState(false);
 
   useEffect(() => {
@@ -131,39 +131,12 @@ export default function ModelDetails() {
         setIsCanceling(false);
       }
     }
-    // if (prediction) {
-    //   const predictionId = prediction?.id;
-    //   setIsCanceling(true);
-    //   try {
-    //     const response = await fetch(
-    //       `/api/model/?id=${encodeURIComponent(predictionId)}`,
-    //       {
-    //         method: "POST",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //       }
-    //     );
-
-    //     if (response.status === 200) {
-    //       const newResponse = await response.json();
-    //       setGlobalPredictions(newResponse);
-    //       setIsPredictionCanceled(true);
-    //       console.log("NEW PREDICTION IN PAGE", newResponse);
-    //       console.log("GLOBAL PREDICTION IN PAGE", prediction);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error canceling prediction:", error);
-    //   } finally {
-    //     setIsCanceling(false);
-    //   }
-    // }
   };
 
   return (
     <Suspense>
-      <div className="flex flex-col items-center">
-        <div className="px-4 lg:px-16">
+      <div className="flex flex-col items-center w-full">
+        <div className="px-4 lg:px-16 w-full">
           <div className="mb-4 inline-flex" onClick={handleBack}>
             <ArrowLeft />
           </div>
@@ -177,7 +150,7 @@ export default function ModelDetails() {
               <div className="!col-span-1 mt-2">
                 <h2 className="mb-4 text-2xl">INPUT</h2>
 
-                {modelDetails.cover_image_url ? (
+                {/* {modelDetails.cover_image_url ? (
                   <Image
                     src={modelDetails.cover_image_url}
                     alt="img"
@@ -187,7 +160,7 @@ export default function ModelDetails() {
                   />
                 ) : (
                   <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
-                )}
+                )} */}
 
                 {/* Dynamic Input */}
                 <div className="mt-10">
@@ -205,71 +178,88 @@ export default function ModelDetails() {
                   OUTPUT
                   {prediction?.status === "starting" ? <Loading /> : null}
                 </h2>
-                {prediction?.output && (
-                  <div>
-                    {Array.isArray(prediction?.output) ? (
-                      prediction.output.map((url, index) => (
-                        <div key={index}>
-                          {url.endsWith(".mp4") ||
-                          url.endsWith(".webm") ||
-                          url.endsWith(".ogg") ? (
+                {showInitialImage ? (
+                  <Image
+                    src={modelDetails.cover_image_url}
+                    alt="img"
+                    width={700}
+                    height={400}
+                    priority
+                  />
+                ) : (
+                  prediction?.output && (
+                    <div>
+                      {Array.isArray(prediction?.output) ? (
+                        prediction.output.map((url, index) => (
+                          <div key={index}>
+                            {url.endsWith(".mp4") ||
+                            url.endsWith(".webm") ||
+                            url.endsWith(".ogg") ? (
+                              // Render a video element if the URL ends with a video file extension
+                              <video controls width="700" height="400">
+                                <source src={url} type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : url.endsWith(".mp3") ||
+                              url.endsWith(".wav") ||
+                              url.endsWith(".ogg") ? (
+                              // Render an audio element if the URL ends with an audio file extension
+                              <audio controls>
+                                <source src={url} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                              </audio>
+                            ) : (
+                              // Render an image element otherwise
+                              <Image
+                                src={url}
+                                alt={`image ${index + 1}`}
+                                width={700}
+                                height={400}
+                              />
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <div>
+                          {prediction.output.endsWith(".mp4") ||
+                          prediction.output.endsWith(".webm") ||
+                          prediction.output.endsWith(".ogg") ? (
                             // Render a video element if the URL ends with a video file extension
                             <video controls width="700" height="400">
-                              <source src={url} type="video/mp4" />
+                              <source
+                                src={prediction.output}
+                                type="video/mp4"
+                              />
                               Your browser does not support the video tag.
                             </video>
-                          ) : url.endsWith(".mp3") ||
-                            url.endsWith(".wav") ||
-                            url.endsWith(".ogg") ? (
+                          ) : prediction.output.endsWith(".mp3") ||
+                            prediction.output.endsWith(".wav") ||
+                            prediction.output.endsWith(".ogg") ? (
                             // Render an audio element if the URL ends with an audio file extension
                             <audio controls>
-                              <source src={url} type="audio/mpeg" />
+                              <source
+                                src={prediction.output}
+                                type="audio/mpeg"
+                              />
                               Your browser does not support the audio element.
                             </audio>
                           ) : (
                             // Render an image element otherwise
                             <Image
-                              src={url}
-                              alt={`image ${index + 1}`}
+                              src={prediction.output}
+                              alt="image"
                               width={700}
                               height={400}
                             />
                           )}
                         </div>
-                      ))
-                    ) : (
-                      <div>
-                        {prediction.output.endsWith(".mp4") ||
-                        prediction.output.endsWith(".webm") ||
-                        prediction.output.endsWith(".ogg") ? (
-                          // Render a video element if the URL ends with a video file extension
-                          <video controls width="700" height="400">
-                            <source src={prediction.output} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
-                        ) : prediction.output.endsWith(".mp3") ||
-                          prediction.output.endsWith(".wav") ||
-                          prediction.output.endsWith(".ogg") ? (
-                          // Render an audio element if the URL ends with an audio file extension
-                          <audio controls>
-                            <source src={prediction.output} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                          </audio>
-                        ) : (
-                          // Render an image element otherwise
-                          <Image
-                            src={prediction.output}
-                            alt="image"
-                            width={700}
-                            height={400}
-                          />
-                        )}
+                      )}
+                      <div className="flex items-center gap-2 mt-4">
+                        predict_time: {prediction?.metrics?.predict_time}{" "}
+                        seconds
                       </div>
-                    )}
-                    <div className="flex items-center gap-2 mt-4">
-                      predict_time: {prediction?.metrics?.predict_time} seconds
                     </div>
-                  </div>
+                  )
                 )}
 
                 {prediction?.id ? (
@@ -291,16 +281,6 @@ export default function ModelDetails() {
                     </button>
                   )}
 
-                {/* {prediction &&
-                  (prediction.status === "starting" ||
-                    prediction.status === "processing") && (
-                    <button
-                      onClick={cancelPrediction}
-                      className="cancel-button"
-                    >
-                      Cancel Prediction
-                    </button>
-                  )} */}
                 <div className="mt-1">
                   {prediction?.output && (
                     <span>
@@ -313,9 +293,7 @@ export default function ModelDetails() {
 
                 <div className="mt-1">
                   {prediction?.status === "failed" && (
-                    <span>
-                     Error: {prediction.error}
-                    </span>
+                    <span>Error: {prediction.error}</span>
                   )}
                 </div>
               </div>
