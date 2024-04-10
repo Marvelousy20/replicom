@@ -58,12 +58,12 @@ export default function ModelDetails() {
   const owner = searchParams.get("owner");
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
-  // const { prediction, setGlobalPredictions, setIsPredictionCanceled } =
-  //   usePredictionContext();
 
-  const { prediction, setPrediction, showInitialImage } =
+  const { prediction, setPrediction, showInitialImage, setShowInitialImage } =
     usePredictionContext();
+
   const [isCanceling, setIsCanceling] = useState(false);
+  console.log("MODEL DETAILS", modelDetails);
 
   useEffect(() => {
     if (owner && name) {
@@ -80,6 +80,7 @@ export default function ModelDetails() {
       };
 
       fetchModelDetails();
+      setShowInitialImage(true);
     }
   }, [owner, name]);
 

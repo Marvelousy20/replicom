@@ -126,6 +126,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         if (!isNaN(intValue) && Number.isInteger(intValue)) {
           sanitizedFormData[key] = intValue;
         } else {
+          sanitizedFormData[key] = value;
           // Handle the case where the value is not a valid integer
           console.error(`Invalid integer value for ${key}: ${value}`);
         }
@@ -320,7 +321,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     formData[key] !== undefined ? formData[key].toString() : ""
                   }
                   onChange={(event) => handleInputChange(event, key)}
-                  className="mt-1 px-2 py-2 block w-full rounded-md border w-full border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                  className="mt-1 px-2 py-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                 >
                   {(() => {
                     const refKey = field.allOf[0].$ref.split("/").pop();
