@@ -274,7 +274,7 @@ export default function ModelDetails() {
                   (prediction?.status === "starting" ||
                     prediction?.status === "processing") && (
                     <button
-                      className="w-[100px] h-[40px] flex items-center justify-center text-white mt-4 border"
+                      className="w-[100px] h-[40px] flex items-center justify-center  mt-4 border"
                       onClick={cancelPrediction}
                     >
                       {isCanceling ? <Loader size={23} /> : "CANCEL"}
