@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import ModelItem from "@/components/ModelItem";
 import { usePredictionContext } from "@/context/prediction";
+import axios from "axios";
+import { Pagination } from 'antd';
+import SearchBar from "@/components/search-bar/search-bar";
 
 interface ModelProps {
   cover_image_url: string;
@@ -11,41 +14,28 @@ interface ModelProps {
   description: string;
 }
 
-interface AllModels {
-  next: string;
-}
-
-export default function Home() {
-  const [models, setModels] = useState<ModelProps[] | []>([]);
-  const [allModels, setAllModels] = useState<AllModels | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const getModels = async () => {
-    try {
-      const response = await fetch("/api");
-      const result = await response.json();
-      setModels(result.results);
-      // This includes the all the data including the next and previous links.
-      setAllModels(result);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleNextClick = async () => {
-    if (allModels?.next) {
-      const response = await fetch(
-        `/api?url=${encodeURIComponent(allModels.next)}`
-      );
-      const result = await response.json();
-      setModels((prevModels) => [...prevModels, ...result.results]);
-      setAllModels(result);
-    }
-  };
+export default function () {
+  const [searchString, setSearchString] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
+  const [loadedModules, setLoadedModules] = useState<any[]>([]);
+  const [displayedModules, setDisplayedModules] = useState<any[]>([]);
+  const [filteredModules, setFilteredModules] = useState<any[]>([]);
 
   useEffect(() => {
-    getModels();
-  }, []);
+    const filtered = searchString
+      ? loadedModules.filter((module) =>
+        module.name?.toLowerCase().includes(searchString.toLowerCase())
+      )
+      : loadedModules;
+    setFilteredModules(filtered);
+    if (searchString) {
+      setCurrentPage(1);
+      updateDisplayedModules(filtered, 1);
+    } else {
+      updateDisplayedModules(filtered, currentPage);
+    }
+  }, [searchString, loadedModules]);
 
   const { setPrediction } = usePredictionContext();
 
@@ -56,68 +46,63 @@ export default function Home() {
     };
   }, [setPrediction]);
 
-  console.log("ALL MODELS", allModels);
-  console.log("MODELS", models);
+  async function getData() {
+    const response = await axios.get("http://127.0.0.1:8000/api/replicate/")
 
-  // Filter all models
-  const filteredModels = models.filter((model) =>
-    model?.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    setLoadedModules(response.data);
+    updateDisplayedModules(response.data, currentPage);
+  }
+
+  useEffect(() => {
+
+    getData()
+
+  }, []);
+
+  const handlePageChange = (page: any) => {
+    setCurrentPage(page);
+    updateDisplayedModules(filteredModules, page)
+  }
+
+  const updateDisplayedModules = (modules: any[], page: number) => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setDisplayedModules(modules.slice(startIndex, endIndex));
+  };
+
   return (
-    <main className="">
-      <div className="md:px-10 px-5 flex items-center justify-between mb-10">
-        <h1 className="text-4xl text-center font-bold">Public Models</h1>
-        <input
-          type="text"
-          placeholder="Search models..."
-          className="px-2 py-3 outline-none border w-2/6 rounded-sm"
-          onChange={(e) => setSearchQuery(e.target.value)}
-          value={searchQuery}
-        />
-      </div>
-
-      {models.length >= 1 && (
-        <div>
-          <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
-            {/* {models.map((model, index) => {
-              return (
-                <div key={index}>
-                  <ModelItem
-                    cover_image_url={model.cover_image_url}
-                    name={model.name}
-                    owner={model.owner}
-                  />
-                </div>
-              );
-            })} */}
-            {filteredModels.length > 0 ? (
-              <div className="flex flex-wrap gap-y-10 gap-x-4 space-y-10 justify-between md:px-10 px-5">
-                {filteredModels.map((model, index) => (
-                  <div key={index}>
-                    <ModelItem
-                      cover_image_url={model.cover_image_url}
-                      name={model.name}
-                      owner={model.owner}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center">No models found.</p>
-            )}
-          </div>
-          <div
-            className="text-white mt-20 font-bold flex justify-center"
-            onClick={handleNextClick}
-          >
-            {allModels?.next && filteredModels.length > 0 ? (
-              <button className="bg-blue-500 hover:bg-opacity-60 w-48 py-4 rounded-sm ease-in-out transition-all duration-300">
-                View More
-              </button>
-            ) : null}
-          </div>
+    <>
+      <main className="mt-[80px]">
+        <div className="md:px-10 px-5">
+          <SearchBar
+            setSearchString={setSearchString}
+            searchString={searchString}
+          />
         </div>
-      )}
-    </main>
+
+        {displayedModules && displayedModules.length > 0 ? (
+          <>
+            <div className="flex flex-wrap gap-y-10 gap-x-4 justify-between md:px-10 px-5">
+              {displayedModules.map((model, idx) => (
+                <ModelItem key={idx} cover_image_url={model.image_url}
+                  name={model.name}
+                  owner={model.owner} 
+                  github={model.github_url}/>
+
+              ))}
+            </div>
+            <div className="flex items-center my-[30px] ">
+              <Pagination current={currentPage} total={filteredModules.length} defaultPageSize={26} showSizeChanger={false} onChange={handlePageChange} className="dark:text-white mx-auto" />
+            </div>
+          </>
+        ) : (
+          <span className="md:px-10 px-5 text-[26px]">No modules...</span>
+        )}
+
+      </main>
+
+
+    </>
   );
 }
+

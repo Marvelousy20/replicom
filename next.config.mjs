@@ -16,6 +16,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "tjzk.replicate.delivery",
       },
+      {
+        protocol: "https",
+        hostname: "pbxt.replicate.delivery",
+      }
     ],
   },
   experimental: {

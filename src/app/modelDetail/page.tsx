@@ -138,14 +138,14 @@ export default function ModelDetails() {
     <Suspense>
       <div className="flex flex-col items-center w-full">
         <div className="px-4 lg:px-16 w-full">
-          <div className="mb-4 inline-flex" onClick={handleBack}>
+          {/* <div className="mb-4 inline-flex" onClick={handleBack}>
             <ArrowLeft />
-          </div>
+          </div> */}
           {/* Content */}
 
-          <p className="text-xl font-bold mt-4">{modelDetails.name}</p>
+          <p className="text-3xl font-bold mt-6">{modelDetails.name}</p>
           <p>{modelDetails.description}</p>
-          <div className="relative">
+          <div className="relative mt-[40px]">
             <div className="grid grid-cols-1 lg:grid-cols-2 mt-3 gap-10 justify-center flex-wrap border-t-2 h-full">
               {/* Input */}
               <div className="!col-span-1 mt-2">
@@ -164,7 +164,7 @@ export default function ModelDetails() {
                 )} */}
 
                 {/* Dynamic Input */}
-                <div className="mt-10">
+                <div className="mt-5">
                   <DynamicForms
                     schema={schemas}
                     version={version}
