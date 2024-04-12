@@ -32,12 +32,19 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   image,
 }) => {
 
-  let userDataString = null;
-  if (typeof window !== 'undefined') {
-    userDataString = localStorage.getItem('userData');
-  }
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
+  const userDataString = localStorage.getItem('userData');
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const walletAddress = userData?.walletAddress;
+
+  useEffect( () => { 
+     if (walletAddress) {
+      setIsButtonEnabled(true);
+     } else {
+      setIsButtonEnabled(false);
+     }
+  }, [])
 
   const initialFormData = Object.fromEntries(
     Object.entries(schema.Input.properties).map(([key, field]) => [
@@ -446,8 +453,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           >
             Reset
           </div>
-          <div className="bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70">
-            <button type="submit">Boot + Runs</button>
+          <div className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${isButtonEnabled ? '' : 'bg-opacity-70 cursor-not-allowed'}`}>
+            <button type="submit"  disabled={!isButtonEnabled}>Boot + Runs</button>
           </div>
         </div>
       </div>

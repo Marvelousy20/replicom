@@ -70,14 +70,15 @@ export async function POST(request: NextRequest) {
         }
       );
       const data = await response.json();
-      return Response.json(data);
+      return new NextResponse(JSON.stringify(data.data));
       // return res.json(data);
     } catch (error) {
       console.error(error);
-      return Response.json({
+      return new NextResponse(JSON.stringify({
         error: "An error occurred while processing your request.",
         status: 500,
-      });
+      }));
+     
     }
   } else {
     // Handle the case where cancelUrl is null

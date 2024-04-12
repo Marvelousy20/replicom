@@ -17,6 +17,7 @@ const UserMenuDetail = () => {
                 router.push('/prediction')
                 break;
             case '3':
+                localStorage.removeItem('userData');
                 signOut();
                 break;
             default:
