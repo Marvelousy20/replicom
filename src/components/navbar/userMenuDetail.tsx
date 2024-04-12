@@ -44,7 +44,6 @@ const UserMenuDetail = () => {
     ];
 
     const AvatarUrl = localStorage.getItem("userData")
-    console.log(AvatarUrl,'avatar')
 
     return (
         <Dropdown menu={{ items, onClick }} overlayStyle={{width:"150px"}}>

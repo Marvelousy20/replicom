@@ -11,6 +11,7 @@ import DynamicForms from "@/components/DynamicForms";
 import { ArrowLeft } from "lucide-react";
 import { Loader } from "@mantine/core";
 import { formatTimestamp } from "@/lib/utils";
+import axios from "axios";
 
 interface Component {
   schemas: {
@@ -57,13 +58,22 @@ export default function ModelDetails() {
   const name = searchParams.get("name");
   const owner = searchParams.get("owner");
 
+  let userDataString = null;
+  if (typeof window !== 'undefined') {
+    userDataString = localStorage.getItem('userData');
+  }
+  const userData = userDataString ? JSON.parse(userDataString) : null;
+  const walletAddress = userData?.walletAddress;
+  console.log(walletAddress,"-----------")
+  const model = owner+'/'+ name
+
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
 
   const { prediction, setPrediction, showInitialImage, setShowInitialImage } =
     usePredictionContext();
 
   const [isCanceling, setIsCanceling] = useState(false);
-  console.log("MODEL DETAILS", modelDetails);
+  // console.log("MODEL DETAILS", modelDetails);
 
   useEffect(() => {
     if (owner && name) {
@@ -102,7 +112,7 @@ export default function ModelDetails() {
     setPrediction(null);
     router.back();
   };
-
+  
   const cancelPrediction = async () => {
     if (
       prediction &&
@@ -120,6 +130,9 @@ export default function ModelDetails() {
         if (!response.ok) throw new Error("Network response was not ok.");
 
         const canceledPrediction = await response.json();
+        console.log('--------------', walletAddress, model, prediction?.metrics?.predict_time, prediction?.created_at)
+        const cancelPredictionResponse = await axios.post('http://127.0.0.1:8000/api/prediction/', {walletAddress: `${walletAddress}`, status:'canceled',model:model , created:prediction?.created_at,time:"0.0" } )
+
         setPrediction(canceledPrediction);
         console.log(
           "CANCELELED PREDICTION INSIDEMODEL DETAILS",
@@ -144,7 +157,7 @@ export default function ModelDetails() {
           {/* Content */}
 
           <p className="text-3xl font-bold mt-6">{modelDetails.name}</p>
-          <p>{modelDetails.description}</p>
+          <p className="pt-[20px]">{modelDetails.description}</p>
           <div className="relative mt-[40px]">
             <div className="grid grid-cols-1 lg:grid-cols-2 mt-3 gap-10 justify-center flex-wrap border-t-2 h-full">
               {/* Input */}
@@ -179,9 +192,9 @@ export default function ModelDetails() {
                   OUTPUT
                   {prediction?.status === "starting" ? <Loading /> : null}
                 </h2>
-                {showInitialImage ? (
+                {showInitialImage && modelDetails.cover_image_url  ? (
                   <Image
-                    src={modelDetails.cover_image_url}
+                    src={modelDetails?.cover_image_url}
                     alt="img"
                     width={700}
                     height={400}

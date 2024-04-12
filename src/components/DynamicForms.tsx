@@ -31,6 +31,14 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   version,
   image,
 }) => {
+
+  let userDataString = null;
+  if (typeof window !== 'undefined') {
+    userDataString = localStorage.getItem('userData');
+  }
+  const userData = userDataString ? JSON.parse(userDataString) : null;
+  const walletAddress = userData?.walletAddress;
+
   const initialFormData = Object.fromEntries(
     Object.entries(schema.Input.properties).map(([key, field]) => [
       key,
@@ -109,7 +117,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     }
   }, [prediction?.status]);
 
-  console.log("PREDICTION INSIDE DYNAMIC FORM", prediction);
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -181,7 +189,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
       const poll = async (id: string) => {
         try {
-          const pollResponse = await fetch(`/api/output?id=${id}`);
+          const pollResponse = await fetch(`/api/output?id=${id}&walletAddress=${walletAddress}`);
           const updatedPrediction = await pollResponse.json();
           setPrediction(updatedPrediction);
 
