@@ -10,7 +10,7 @@ type PredictionDataType = {
     created: string
 }
 
-const prediction = () => {
+const Prediction = () => {
 
     let userDataString = null;
     if (typeof window !== 'undefined') {
@@ -91,4 +91,4 @@ const prediction = () => {
     )
 }
 
-export default prediction;
+export default Prediction;

@@ -14,7 +14,7 @@ interface ModelProps {
   description: string;
 }
 
-export default function () {
+const Page = () => {
   const [searchString, setSearchString] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
@@ -106,3 +106,4 @@ export default function () {
   );
 }
 
+export default Page
