@@ -11,7 +11,7 @@ const UserMenuDetail = () => {
     const onClick: MenuProps['onClick'] = ({ key }) => {
         switch (key) {
             case '1':
-    
+
                 break;
             case '2':
                 router.push('/prediction')
@@ -24,12 +24,9 @@ const UserMenuDetail = () => {
                 break;
         }
     }
-    
+
     const items: MenuProps['items'] = [
-        {
-            label: 'Profile',
-            key: '1',
-        },
+
         {
             label: 'Prediction',
             key: '2',
@@ -41,13 +38,13 @@ const UserMenuDetail = () => {
             label: 'Sign Out',
             key: '3',
         },
-    
+
     ];
 
     const AvatarUrl = localStorage.getItem("userData")
 
     return (
-        <Dropdown menu={{ items, onClick }} overlayStyle={{width:"150px"}}>
+        <Dropdown menu={{ items, onClick }} overlayStyle={{ width: "150px" }}>
             <a onClick={(e) => e.preventDefault()}>
                 <Space>
                     <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">

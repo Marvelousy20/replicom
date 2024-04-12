@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from replicate.models import ReplicateData
 from requests.exceptions import ConnectTimeout
 import time
-import gradio as gr
 
 
 def index(request):

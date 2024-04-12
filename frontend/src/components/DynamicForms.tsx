@@ -38,12 +38,12 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const walletAddress = userData?.walletAddress;
 
-  useEffect( () => { 
-     if (walletAddress) {
+  useEffect(() => {
+    if (walletAddress) {
       setIsButtonEnabled(true);
-     } else {
+    } else {
       setIsButtonEnabled(false);
-     }
+    }
   }, [])
 
   const initialFormData = Object.fromEntries(
@@ -137,13 +137,17 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         schema.Input.properties[key]?.allOf ||
         schema.Input.properties[key]?.type === "number"
       ) {
-        const intValue = parseInt(value as string, 10);
-        if (!isNaN(intValue) && Number.isInteger(intValue)) {
-          sanitizedFormData[key] = intValue;
+        if (value === "") {
+          sanitizedFormData[key] = 0;
         } else {
-          sanitizedFormData[key] = value;
-          // Handle the case where the value is not a valid integer
-          console.error(`Invalid integer value for ${key}: ${value}`);
+          const intValue = parseInt(value as string, 10);
+          if (!isNaN(intValue) && Number.isInteger(intValue)) {
+            sanitizedFormData[key] = intValue;
+          } else {
+            sanitizedFormData[key] = value;
+            // Handle the case where the value is not a valid integer
+            console.error(`Invalid integer value for ${key}: ${value}`);
+          }
         }
       } else {
         sanitizedFormData[key] = value;
@@ -366,7 +370,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     name={key}
                     checked={formData[key] as boolean} // Cast to boolean since formData[key] is boolean
                     onChange={(event) => handleBooleanInputChange(event, key)}
-                    // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                  // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                   />
                   <div>{field.description}</div>
                 </div>
@@ -454,7 +458,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
             Reset
           </div>
           <div className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${isButtonEnabled ? '' : 'bg-opacity-70 cursor-not-allowed'}`}>
-            <button type="submit"  disabled={!isButtonEnabled}>Boot + Runs</button>
+            <button type="submit" disabled={!isButtonEnabled}>Boot + Runs</button>
           </div>
         </div>
       </div>
