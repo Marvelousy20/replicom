@@ -154,11 +154,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       }
     }
 
-    console.log(sanitizedFormData);
+
 
     const requestBody = { version, input: sanitizedFormData };
-
-    console.log("SENT TO BACKEND", requestBody);
 
     try {
       const response = await fetch("/api/output", {
@@ -171,7 +169,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
       let predictionData = await response.json();
 
-      console.log("PREDICTIONDATA inside form", predictionData);
       if (response.status !== 200) {
         setError(predictionData.detail);
         return;
@@ -183,7 +180,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       }
 
       if (predictionData.status === 402) {
-        console.log(predictionData);
+
         alert(predictionData.detail);
         return;
       }
@@ -261,7 +258,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setResetKey((prevKey) => prevKey + 1); // This forces a re-render if needed
   };
 
-  // console.log("GLOBAL PREDICTION OUTSIDE SUBMIT FORM", globalPredictions);
+
 
   // Helper function to determine the type of a field
   const getFieldType = (key: string, schema: MainSchema) => {

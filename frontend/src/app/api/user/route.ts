@@ -2,15 +2,16 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { type NextRequest } from "next/server";
 
-export async function GET(request:NextRequest, res:NextResponse) {
+export async function GET(request: NextRequest, res: NextResponse) {
     const searchParams = request.nextUrl.searchParams;
     const walletAddress = searchParams.get('walletAddress');
+    console.log(walletAddress, "wallet")
 
     if (!walletAddress) {
         return new NextResponse(
-            JSON.stringify({ error: "WalletAddress are required"}), 
+            JSON.stringify({ error: "WalletAddress are required" }),
             {
-                status:400,
+                status: 400,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -19,18 +20,19 @@ export async function GET(request:NextRequest, res:NextResponse) {
     }
 
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/registeruser/?walletAddress=${walletAddress}`);
+        const response = await axios.get(`http://65.108.226.61:8000/api/registeruser/?walletAddress=${walletAddress}`);
+        console.log(response.data.length, response.data, "-response")
         if (response.data.length == 0) {
-            const res = await axios.post('http://127.0.0.1:8000/api/registeruser/', {walletAddress: `${walletAddress}`})
-            const response = await axios.get(`http://127.0.0.1:8000/api/registeruser/?walletAddress=${walletAddress}`);
-            console.log(JSON.stringify(response.data), "+response")
+            const res = await axios.post(`http://65.108.226.61:8000/api/registeruser/`, { walletAddress: `${walletAddress}` })
+            const response = await axios.get(`http://65.108.226.61:8000/api/registeruser/?walletAddress=${walletAddress}`);
+            console.log(response.data, response.data.length, "+response")
             return new NextResponse(JSON.stringify(response.data[0]));
         }
-        console.log(response.data, "-response")
+
         return new NextResponse(JSON.stringify(response.data[0]));
 
-    } catch(error) {
-    
+    } catch (error) {
+
         return new NextResponse(
             JSON.stringify({
                 error: "Failed to register"
@@ -39,10 +41,10 @@ export async function GET(request:NextRequest, res:NextResponse) {
                 status: 500,
                 headers: {
                     "Content-Type": "application/json",
-                  },
-                }
+                },
+            }
         )
     }
-    
-    
+
+
 }

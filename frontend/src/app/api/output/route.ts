@@ -2,6 +2,8 @@ import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { type NextRequest, NextResponse } from "next/server";
 
+require('dotenv').config();
+
 export async function POST(request: Request, res: NextApiResponse) {
   const body = await request.json();
   try {
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
       }
     );
   }
-  
+
   try {
     // Make the request to the Replicate API for fetching the prediction result
     const response = await axios.get(
@@ -50,27 +52,27 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-    
+
     const predictionReplay = response.data;
-    console.log(predictionReplay.status)
-   
-    if (predictionReplay.status == "succeeded")
-    {
-      const predictionSave=await axios.post('http://127.0.0.1:8000/api/prediction/', {walletAddress: `${walletAddress}`, status:'succeeded',model:predictionReplay.model, created:predictionReplay.created_at, 
-      time:predictionReplay.metrics.predict_time})
-      console.log(predictionSave,"---success-----")
+
+
+    if (predictionReplay.status == "succeeded") {
+      const predictionSave = await axios.post(`http://65.108.226.61:8000/api/prediction/`, {
+        walletAddress: `${walletAddress}`, status: 'succeeded', model: predictionReplay.model, created: predictionReplay.created_at,
+        time: predictionReplay.metrics.predict_time
+      })
+
     }
-    if (predictionReplay.status == "failed")
-    {
-      const predictionSave=await axios.post('http://127.0.0.1:8000/api/prediction/', {walletAddress: `${walletAddress}`, status:'failed',model:predictionReplay.model, created:predictionReplay.created_at, time:"0.0" })
-      console.log(predictionSave,"---failed-----")
+    if (predictionReplay.status == "failed") {
+      const predictionSave = await axios.post('http://65.108.226.61:8000/api/prediction/', { walletAddress: `${walletAddress}`, status: 'failed', model: predictionReplay.model, created: predictionReplay.created_at, time: "0.0" })
+
     }
     // Return the response data
     return new NextResponse(JSON.stringify(response.data));
   } catch (error) {
     console.error(error);
     // Return an error response
-    
+
     return new NextResponse(
       JSON.stringify({ error: "Failed to fetch prediction result" }),
       {

@@ -47,7 +47,7 @@ const Page = () => {
   }, [setPrediction]);
 
   async function getData() {
-    const response = await axios.get("http://127.0.0.1:8000/api/replicate/")
+    const response = await axios.get("http://65.108.226.61:8000/api/replicate/")
 
     setLoadedModules(response.data);
     updateDisplayedModules(response.data, currentPage);
@@ -56,6 +56,7 @@ const Page = () => {
   useEffect(() => {
 
     getData()
+
 
   }, []);
 
@@ -86,8 +87,8 @@ const Page = () => {
               {displayedModules.map((model, idx) => (
                 <ModelItem key={idx} cover_image_url={model.image_url}
                   name={model.name}
-                  owner={model.owner} 
-                  github={model.github_url}/>
+                  owner={model.owner}
+                  github={model.github_url} />
 
               ))}
             </div>

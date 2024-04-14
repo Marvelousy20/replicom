@@ -15,6 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = ['walletAddress', 'balance', 'predict_time', 'profile_img']
         ready_only_fields = ['id','walletAddress']
+        lookup_field = ['walletAddress']
+        search_fields = ['walletAddress']
 
 class PredictionSerializer(serializers.ModelSerializer):
     class Meta:

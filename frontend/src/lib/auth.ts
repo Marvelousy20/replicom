@@ -1,4 +1,4 @@
-import { AuthOptions, RequestInternal  } from "next-auth";
+import { AuthOptions, RequestInternal } from "next-auth";
 import { ethers } from "ethers";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
@@ -10,13 +10,12 @@ async function authorizeCrypto(
   if (!credentials) return null;
 
   const { walletAddress, signedNonce } = credentials;
-  console.log(walletAddress, '*****************')
+
 
   // Get user from database with their generated nonce
-  const user = await axios.get(`http://127.0.0.1:8000/api/registeruser/?walletAddress=${walletAddress}`);
+  const user = await axios.get(`http://65.108.226.61:8000/api/registeruser/?walletAddress=${walletAddress}`);
+  // console.log(user, "user")
 
-  console.log(user.data[0]?.walletAddress,'-----------')
-  
   if (!user.data[0]?.walletAddress) return null;
 
   const verifyNonce = "Welcome to sign in Repliate.com!";

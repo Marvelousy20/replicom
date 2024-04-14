@@ -25,7 +25,6 @@ def get_data(str):
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET,PATCH"}
     max_retries = 3
     retry_delay = 2
-    print("----111-----")
     for retry in range(max_retries):
        try:
           response = requests.get(str,  headers=headers, timeout=10)

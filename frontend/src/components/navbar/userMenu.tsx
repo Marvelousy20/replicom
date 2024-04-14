@@ -44,7 +44,7 @@ const UserMenu = () => {
         window.open("https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn");
         return;
       }
-  
+
       // Get the wallet provider, the signer and address
       //  see: https://docs.ethers.org/v6/getting-started/#starting-signing
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -54,14 +54,14 @@ const UserMenu = () => {
       const currentuser = {
         walletAddress: response.data.walletAddress,
         AvatarUrl: response.data.profile_img,
-        
+
       }
       // setUser(currentuser);
 
       localStorage.setItem('userData', JSON.stringify(currentuser))
       // Sign the received nonce
       const signedNonce = await signer.signMessage("Welcome to sign in Repliate.com!");
-  
+
       // Use NextAuth to sign in with our address and the nonce
       await signIn("crypto", {
         walletAddress,
@@ -72,13 +72,13 @@ const UserMenu = () => {
       console.log(error)
     }
   }
-  
+
   const onClick: MenuProps['onClick'] = ({ key }) => {
     if (key == '1') {
       onSignInWithCrypto()
     }
   }
-  
+
   const items: MenuProps['items'] = [
     {
       label: 'Sign In',

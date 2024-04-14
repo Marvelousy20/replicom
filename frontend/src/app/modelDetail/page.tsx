@@ -64,8 +64,8 @@ export default function ModelDetails() {
   }
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const walletAddress = userData?.walletAddress;
-  console.log(walletAddress,"-----------")
-  const model = owner+'/'+ name
+
+  const model = owner + '/' + name
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
 
@@ -112,7 +112,7 @@ export default function ModelDetails() {
     setPrediction(null);
     router.back();
   };
-  
+
   const cancelPrediction = async () => {
     if (
       prediction &&
@@ -130,15 +130,11 @@ export default function ModelDetails() {
         if (!response.ok) throw new Error("Network response was not ok.");
 
         const canceledPrediction = await response.json();
-        console.log('--------------', walletAddress, model, prediction?.metrics?.predict_time, prediction?.created_at)
-        const cancelPredictionResponse = await axios.post('http://127.0.0.1:8000/api/prediction/', {walletAddress: `${walletAddress}`, status:'canceled',model:model , created:prediction?.created_at,time:"0.0" } )
+
+        const cancelPredictionResponse = await axios.post(`http://65.108.226.61:8000/api/prediction/`, { walletAddress: `${walletAddress}`, status: 'canceled', model: model, created: prediction?.created_at, time: "0.0" })
 
         setPrediction(canceledPrediction);
-        console.log(
-          "CANCELELED PREDICTION INSIDEMODEL DETAILS",
-          canceledPrediction
-        );
-        console.log("PREDICTION INSIDE MODEL DETAIL", prediction);
+
       } catch (error) {
         console.error("Error canceling prediction:", error);
       } finally {
@@ -192,7 +188,7 @@ export default function ModelDetails() {
                   OUTPUT
                   {prediction?.status === "starting" ? <Loading /> : null}
                 </h2>
-                {showInitialImage && modelDetails.cover_image_url  ? (
+                {showInitialImage && modelDetails.cover_image_url ? (
                   <Image
                     src={modelDetails?.cover_image_url}
                     alt="img"
@@ -207,8 +203,8 @@ export default function ModelDetails() {
                         prediction.output.map((url, index) => (
                           <div key={index}>
                             {url.endsWith(".mp4") ||
-                            url.endsWith(".webm") ||
-                            url.endsWith(".ogg") ? (
+                              url.endsWith(".webm") ||
+                              url.endsWith(".ogg") ? (
                               // Render a video element if the URL ends with a video file extension
                               <video controls width="700" height="400">
                                 <source src={url} type="video/mp4" />
@@ -236,8 +232,8 @@ export default function ModelDetails() {
                       ) : (
                         <div>
                           {prediction.output.endsWith(".mp4") ||
-                          prediction.output.endsWith(".webm") ||
-                          prediction.output.endsWith(".ogg") ? (
+                            prediction.output.endsWith(".webm") ||
+                            prediction.output.endsWith(".ogg") ? (
                             // Render a video element if the URL ends with a video file extension
                             <video controls width="700" height="400">
                               <source
