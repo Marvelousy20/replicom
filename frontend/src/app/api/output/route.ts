@@ -57,14 +57,14 @@ export async function GET(request: NextRequest) {
 
 
     if (predictionReplay.status == "succeeded") {
-      const predictionSave = await axios.post(`http://65.108.226.61:8000/api/prediction/`, {
+      const predictionSave = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, {
         walletAddress: `${walletAddress}`, status: 'succeeded', model: predictionReplay.model, created: predictionReplay.created_at,
         time: predictionReplay.metrics.predict_time
       })
 
     }
     if (predictionReplay.status == "failed") {
-      const predictionSave = await axios.post('http://65.108.226.61:8000/api/prediction/', { walletAddress: `${walletAddress}`, status: 'failed', model: predictionReplay.model, created: predictionReplay.created_at, time: "0.0" })
+      const predictionSave = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, { walletAddress: `${walletAddress}`, status: 'failed', model: predictionReplay.model, created: predictionReplay.created_at, time: "0.0" })
 
     }
     // Return the response data

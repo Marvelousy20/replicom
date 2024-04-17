@@ -47,8 +47,7 @@ const Page = () => {
   }, [setPrediction]);
 
   async function getData() {
-    const response = await axios.get("http://127.0.0.1:8000/api/replicate/")
-
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/replicate/`)
     setLoadedModules(response.data);
     updateDisplayedModules(response.data, currentPage);
   }

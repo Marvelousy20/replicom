@@ -208,6 +208,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           ) {
             if (pollIntervalRef.current) {
               clearInterval(pollIntervalRef.current);
+
             }
           }
         } catch (pollError) {

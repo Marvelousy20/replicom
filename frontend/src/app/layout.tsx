@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { PredictionProvider } from "@/context/prediction";
 import Providers from "@/components/Provider";
 export const metadata: Metadata = {
-  title: "commune openAi",
+  title: "openAi",
   description: "openAi",
 };
 

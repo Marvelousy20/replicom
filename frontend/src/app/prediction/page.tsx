@@ -22,7 +22,7 @@ const Prediction = () => {
     const [predictionData, setPredictionData] = useState<PredictionDataType[]>([]);
 
     async function getPredictionData() {
-        const response = await axios.get(`http://65.108.226.61:8000/api/prediction/?walletAddress=${walletAddress}`)
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/?walletAddress=${walletAddress}`)
         setPredictionData(response.data);
 
     }

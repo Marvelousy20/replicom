@@ -131,7 +131,7 @@ export default function ModelDetails() {
 
         const canceledPrediction = await response.json();
 
-        const cancelPredictionResponse = await axios.post(`http://65.108.226.61:8000/api/prediction/`, { walletAddress: `${walletAddress}`, status: 'canceled', model: model, created: prediction?.created_at, time: "0.0" })
+        const cancelPredictionResponse = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, { walletAddress: `${walletAddress}`, status: 'canceled', model: model, created: prediction?.created_at, time: "0.0" })
 
         setPrediction(canceledPrediction);
 

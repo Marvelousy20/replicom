@@ -13,7 +13,7 @@ async function authorizeCrypto(
 
 
   // Get user from database with their generated nonce
-  const user = await axios.get(`http://65.108.226.61:8000/api/registeruser/?walletAddress=${walletAddress}`);
+  const user = await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/registeruser/?walletAddress=${walletAddress}`);
   // console.log(user, "user")
 
   if (!user.data[0]?.walletAddress) return null;
