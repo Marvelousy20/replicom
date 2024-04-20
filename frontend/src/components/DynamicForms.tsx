@@ -31,10 +31,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   version,
   image,
 }) => {
-
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-  const userDataString = localStorage.getItem('userData');
+  const userDataString = localStorage.getItem("userData");
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const walletAddress = userData?.walletAddress;
 
@@ -44,7 +43,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     } else {
       setIsButtonEnabled(false);
     }
-  }, [])
+  }, []);
 
   const initialFormData = Object.fromEntries(
     Object.entries(schema.Input.properties).map(([key, field]) => [
@@ -124,8 +123,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     }
   }, [prediction?.status]);
 
-
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setShowInitialImage(false);
@@ -154,8 +151,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       }
     }
 
-
-
     const requestBody = { version, input: sanitizedFormData };
 
     try {
@@ -180,7 +175,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       }
 
       if (predictionData.status === 402) {
-
         alert(predictionData.detail);
         return;
       }
@@ -197,7 +191,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
       const poll = async (id: string) => {
         try {
-          const pollResponse = await fetch(`/api/output?id=${id}&walletAddress=${walletAddress}`);
+          const pollResponse = await fetch(
+            `/api/output?id=${id}&walletAddress=${walletAddress}`
+          );
           const updatedPrediction = await pollResponse.json();
           setPrediction(updatedPrediction);
 
@@ -208,7 +204,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           ) {
             if (pollIntervalRef.current) {
               clearInterval(pollIntervalRef.current);
-
             }
           }
         } catch (pollError) {
@@ -258,8 +253,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setPreviewUrls({});
     setResetKey((prevKey) => prevKey + 1); // This forces a re-render if needed
   };
-
-
 
   // Helper function to determine the type of a field
   const getFieldType = (key: string, schema: MainSchema) => {
@@ -368,7 +361,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     name={key}
                     checked={formData[key] as boolean} // Cast to boolean since formData[key] is boolean
                     onChange={(event) => handleBooleanInputChange(event, key)}
-                  // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                    // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                   />
                   <div>{field.description}</div>
                 </div>
@@ -455,8 +448,14 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           >
             Reset
           </div>
-          <div className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${isButtonEnabled ? '' : 'bg-opacity-70 cursor-not-allowed'}`}>
-            <button type="submit" disabled={!isButtonEnabled}>Boot + Runs</button>
+          <div
+            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
+              isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
+            }`}
+          >
+            <button type="submit" disabled={!isButtonEnabled}>
+              Boot + Runs
+            </button>
           </div>
         </div>
       </div>

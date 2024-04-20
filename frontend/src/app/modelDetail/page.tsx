@@ -59,13 +59,13 @@ export default function ModelDetails() {
   const owner = searchParams.get("owner");
 
   let userDataString = null;
-  if (typeof window !== 'undefined') {
-    userDataString = localStorage.getItem('userData');
+  if (typeof window !== "undefined") {
+    userDataString = localStorage.getItem("userData");
   }
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const walletAddress = userData?.walletAddress;
 
-  const model = owner + '/' + name
+  const model = owner + "/" + name;
 
   const [modelDetails, setModelDetails] = useState<ModelProps | null>(null);
 
@@ -131,10 +131,18 @@ export default function ModelDetails() {
 
         const canceledPrediction = await response.json();
 
-        const cancelPredictionResponse = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, { walletAddress: `${walletAddress}`, status: 'canceled', model: model, created: prediction?.created_at, time: "0.0" })
+        const cancelPredictionResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`,
+          {
+            walletAddress: `${walletAddress}`,
+            status: "canceled",
+            model: model,
+            created: prediction?.created_at,
+            time: "0.0",
+          }
+        );
 
         setPrediction(canceledPrediction);
-
       } catch (error) {
         console.error("Error canceling prediction:", error);
       } finally {
@@ -159,18 +167,6 @@ export default function ModelDetails() {
               {/* Input */}
               <div className="!col-span-1 mt-2">
                 <h2 className="mb-4 text-2xl">INPUT</h2>
-
-                {/* {modelDetails.cover_image_url ? (
-                  <Image
-                    src={modelDetails.cover_image_url}
-                    alt="img"
-                    width={700}
-                    height={400}
-                    priority
-                  />
-                ) : (
-                  <div className="h-[400px] w-300px lg:w-[500px] bg-red-500"></div>
-                )} */}
 
                 {/* Dynamic Input */}
                 <div className="mt-5">
@@ -203,8 +199,8 @@ export default function ModelDetails() {
                         prediction.output.map((url, index) => (
                           <div key={index}>
                             {url.endsWith(".mp4") ||
-                              url.endsWith(".webm") ||
-                              url.endsWith(".ogg") ? (
+                            url.endsWith(".webm") ||
+                            url.endsWith(".ogg") ? (
                               // Render a video element if the URL ends with a video file extension
                               <video controls width="700" height="400">
                                 <source src={url} type="video/mp4" />
@@ -232,8 +228,8 @@ export default function ModelDetails() {
                       ) : (
                         <div>
                           {prediction.output.endsWith(".mp4") ||
-                            prediction.output.endsWith(".webm") ||
-                            prediction.output.endsWith(".ogg") ? (
+                          prediction.output.endsWith(".webm") ||
+                          prediction.output.endsWith(".ogg") ? (
                             // Render a video element if the URL ends with a video file extension
                             <video controls width="700" height="400">
                               <source

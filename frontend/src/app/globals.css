@@ -87,3 +87,53 @@
   top: 0;
   bottom: 0;
  }
+
+
+
+ :where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-item a {
+  color: white;
+ }
+
+ :where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis, :where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis  {
+  color: white;
+ }
+
+ .antdesign svg {
+  color: white;
+ }
+
+ :where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-item-active a {
+  color: black;
+}
+
+:where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-next button {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-1kuana8).ant-pagination .ant-pagination-prev button {
+  color: white;
+}
+
+
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-item a {
+  color: black; /* Dark text for light backgrounds */
+}
+
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: black; /* Dark text for visibility */
+}
+
+.antdesign.light svg {
+  color: black; /* Dark icons for light mode */
+}
+
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-item-active a {
+  color: white; /* Light active text, consider changing background if needed */
+  background-color: #555; /* Dark background for active item to make white text visible */
+}
+
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-next button,
+.css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-prev button {
+  color: black; /* Dark arrow buttons for light backgrounds */
+}
