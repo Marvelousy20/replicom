@@ -12,7 +12,9 @@ import { UserContext } from "@/components/UseContext";
 import UserMenuDetail from "./userMenuDetail";
 import axios from "axios";
 import { useContext } from "react";
-import ConnectPolkadot from "../ConnectPolkadot";
+// import ConnectWallet from "../ConnectPolka";
+// import ConnectWallet from "../ConnectWallet";
+import Connect from "../NewConnect";
 
 type userContextType = {
   walletAddress: string | null;
@@ -99,18 +101,20 @@ const UserMenu = () => {
     },
   ];
 
+  console.log(status);
+
   return (
     <>
       {status === "authenticated" ? (
         <UserMenuDetail />
       ) : (
         <div className="flex items-center">
-          <ConnectPolkadot />
-          <Dropdown menu={{ items, onClick }} overlayStyle={{ width: "150px" }}>
+          {/* <ConnectWallet signInWithCrypto={onSignInWithCrypto} /> */}
+          <Connect />
+          <Dropdown menu={{ onClick }} overlayStyle={{ width: "150px" }}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">
-                  {/* <IoReorderThreeOutline className="w-[20px] h-[20px] text-gray-500" /> */}
                   <Image
                     src="/img/user.svg"
                     width={30}

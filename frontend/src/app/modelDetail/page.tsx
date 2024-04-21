@@ -153,14 +153,14 @@ export default function ModelDetails() {
 
   return (
     <Suspense>
-      <div className="flex flex-col items-center w-full">
+      <div className="flex flex-col items-center w-full text-black dark:text-white">
         <div className="px-4 lg:px-16 w-full">
           {/* <div className="mb-4 inline-flex" onClick={handleBack}>
             <ArrowLeft />
           </div> */}
           {/* Content */}
 
-          <p className="text-3xl font-bold mt-6">{modelDetails.name}</p>
+          <p className="text-3xl font-bold mt-12">{modelDetails.name}</p>
           <p className="pt-[20px]">{modelDetails.description}</p>
           <div className="relative mt-[40px]">
             <div className="grid grid-cols-1 lg:grid-cols-2 mt-3 gap-10 justify-center flex-wrap border-t-2 h-full">

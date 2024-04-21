@@ -443,13 +443,13 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
       <div className="sticky bottom-0">
         <div className="flex gap-4 justify-end">
           <div
-            className="font-bold py-2 px-4 rounded border border-black cursor-pointer"
+            className="font-bold py-2 px-4 rounded border border-black dark:border-white cursor-pointer"
             onClick={(event) => handleReset(event)}
           >
             Reset
           </div>
           <div
-            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
+            className={`bg-black dark:bg-slate-700 text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
               isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
             }`}
           >

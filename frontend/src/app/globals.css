@@ -137,3 +137,37 @@
 .css-dev-only-do-not-override-1kuana8.ant-pagination.light .ant-pagination-prev button {
   color: black; /* Dark arrow buttons for light backgrounds */
 }
+
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.avatar-image {
+  display: block;
+  width: 100px; /* Adjust size as needed */
+  height: 100px;
+  border-radius: 50%;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  /* Position the tooltip text */
+  z-index: 1;
+}
+
+.avatar-wrapper:hover .tooltip {
+  visibility: visible;
+}

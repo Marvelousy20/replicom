@@ -15,6 +15,9 @@ const UserMenuDetail = () => {
         router.push("/prediction");
         break;
       case "3":
+        router.push("/profile");
+        break;
+      case "4":
         localStorage.removeItem("userData");
         signOut();
         break;
@@ -32,12 +35,11 @@ const UserMenuDetail = () => {
       type: "divider",
     },
     {
-      label: "Upload Avatar",
-      key: "2",
+      label: "Profile",
+      key: "3",
     },
     {
-      label: "Edit Gmail",
-      key: "3",
+      type: "divider",
     },
     {
       label: "Sign Out",

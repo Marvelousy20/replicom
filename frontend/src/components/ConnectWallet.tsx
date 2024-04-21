@@ -10,6 +10,10 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import Image from "next/image";
 import { WalletCards } from "lucide-react";
+import {
+  InjectedAccountWithMeta,
+  InjectedExtension,
+} from "@polkadot/extension-inject/types";
 
 interface Account {
   address: string;
@@ -18,14 +22,22 @@ interface Account {
   };
 }
 
-export default function ConnectPolkadot() {
+interface ConnectWalletProps {
+  signInWithCrypto: () => Promise<void>; // This matches the signature of onSignInWithCrypto
+}
+
+export default function ConnectPolkadot({
+  signInWithCrypto,
+}: ConnectWalletProps) {
   const [api, setApi] = useState<ApiPromise | null>(null);
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<InjectedAccountWithMeta[]>([]);
   const [accountLoaded, setAccountLoaded] = useState<boolean>(false);
   const [opened, setIsOpened] = useState<boolean>(false);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [selectedAccount, setSelectedAccount] =
+    useState<InjectedAccountWithMeta | null>(null);
   const [tempSelectedAccount, setTempSelectedAccount] =
-    useState<Account | null>(null);
+    useState<InjectedAccountWithMeta | null>(null);
+  const [showConnectOptions, setShowConnectOptions] = useState<boolean>(false);
 
   useEffect(() => {
     const connectApi = async () => {
@@ -40,7 +52,8 @@ export default function ConnectPolkadot() {
   const loadAccounts = () => {
     const storedAccounts = localStorage.getItem("polkadotAccounts");
     if (storedAccounts) {
-      const parsedAccounts: Account[] = JSON.parse(storedAccounts);
+      const parsedAccounts: InjectedAccountWithMeta[] =
+        JSON.parse(storedAccounts);
       setAccounts(parsedAccounts);
       setAccountLoaded(true);
     }
@@ -59,7 +72,7 @@ export default function ConnectPolkadot() {
         "No extension found. Please install the polkadot{.js} extension."
       );
     }
-    const allAccounts = (await web3Accounts()) as Account[];
+    const allAccounts = (await web3Accounts()) as InjectedAccountWithMeta[];
     setAccounts(allAccounts);
     localStorage.setItem("polkadotAccounts", JSON.stringify(allAccounts));
     setAccountLoaded(true);
@@ -77,7 +90,7 @@ export default function ConnectPolkadot() {
 
   const handleShowModal = () => setIsOpened(true);
 
-  const handleTempSelectedAccount = (account: Account) => {
+  const handleTempSelectedAccount = (account: InjectedAccountWithMeta) => {
     setTempSelectedAccount(account);
   };
 
@@ -92,7 +105,7 @@ export default function ConnectPolkadot() {
 
   return (
     <div>
-      {selectedAccount ? (
+      {/* {selectedAccount ? (
         <Button
           className="h-15 relative inline-flex items-center justify-center gap-3 rounded-2xl border-2 border-orange-500 bg-white px-4 py-2 shadow-custom-orange active:top-1 active:shadow-custom-orange-clicked dark:bg-light-dark"
           onClick={handleShowModal}
@@ -113,13 +126,21 @@ export default function ConnectPolkadot() {
         </Button>
       ) : (
         <Button
-          onClick={connectWallet}
+          onClick={() => setShowConnectOptions(true)}
           className="border-2 text-orange-500 border-orange-500 px-4 py-2 shadow-custom-orange active:top-1 active:shadow-custom-orange-clicked bg-light-dark"
         >
           Connect Wallet
         </Button>
-      )}
+      )} */}
 
+      <Button
+        onClick={() => setShowConnectOptions(true)}
+        className="border-2 text-orange-500 border-orange-500 px-4 py-2 shadow-custom-orange active:top-1 active:shadow-custom-orange-clicked bg-light-dark"
+      >
+        Connect Wallet
+      </Button>
+
+      {/* Handles anything polkadot */}
       <Dialog open={opened} onOpenChange={setIsOpened}>
         <DialogContent className="bg-white text-black dark:bg-[#131B2A] dark:text-white">
           <DialogTitle className="flex gap-2 items-center mb-6 font-bold text-2xl">
@@ -151,6 +172,34 @@ export default function ConnectPolkadot() {
               className="w-full bg-transparent border-2 border-yellow-500 h-16 font-bold text-lg text-orange-500"
             >
               Connect Now
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Handles Connect Options */}
+
+      <Dialog open={showConnectOptions} onOpenChange={setShowConnectOptions}>
+        <DialogContent className="bg-white text-black dark:bg-[#131B2A] dark:text-white">
+          <DialogTitle className="text-xl font-bold">
+            Connect Wallet
+          </DialogTitle>
+          <div className="space-y-4 p-4">
+            <Button
+              onClick={handleShowModal}
+              // onClick={connectWallet}
+              className="w-full bg-orange-500 text-white p-2 rounded-lg"
+            >
+              Login with Polkadot
+            </Button>
+            <Button
+              onClick={() => {
+                setShowConnectOptions(false);
+                signInWithCrypto();
+              }}
+              className="w-full bg-gray-700 text-white p-2 rounded-lg"
+            >
+              Login with MetaMask
             </Button>
           </div>
         </DialogContent>

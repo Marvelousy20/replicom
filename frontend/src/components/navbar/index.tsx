@@ -18,7 +18,7 @@ const NavigationBar = () => {
   return (
     <header className="top-0 left-0 w-full bg-white dark:bg-[#131B2A] fixed z-10 animate-menu-fade shadow-xl">
       <nav className="py-4 border-b-[0px] px-10">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center gap-4">
           <Logo />
           <SearchBar
             searchString={searchString}
