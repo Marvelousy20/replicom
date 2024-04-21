@@ -53,9 +53,12 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
 
     const accounts = await web3Accounts();
     if (accounts.length === 0) {
-      alert(
-        "No accounts found. Please create an account in the Polkadot{.js} extension."
+      const userChoice = confirm(
+        "The Polkadot{.js} extension is required to continue. Click OK to install it."
       );
+      if (userChoice) {
+        window.open("https://polkadot.js.org/extension/", "_blank"); // Change this URL to the Polkadot{.js} extension’s download page
+      }
       return;
     }
 
