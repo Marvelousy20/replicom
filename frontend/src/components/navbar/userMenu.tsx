@@ -89,14 +89,6 @@ const UserMenu = () => {
       label: "Sign In",
       key: "1",
     },
-    {
-      label: "Upload Avatar",
-      key: "2",
-    },
-    {
-      label: "Edit Gmail",
-      key: "3",
-    },
   ];
 
   console.log(status);
@@ -109,7 +101,7 @@ const UserMenu = () => {
         <div className="flex items-center">
           {/* <ConnectWallet signInWithCrypto={onSignInWithCrypto} /> */}
           <Connect signInWithCrypto={onSignInWithCrypto} />
-          <Dropdown menu={{ onClick }} overlayStyle={{ width: "150px" }}>
+          <Dropdown menu={{ onClick, items }} overlayStyle={{ width: "150px" }}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">
