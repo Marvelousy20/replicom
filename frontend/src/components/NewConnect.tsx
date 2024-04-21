@@ -24,7 +24,11 @@ interface LoginParams {
   account: InjectedAccountWithMeta;
 }
 
-export default function Connect() {
+interface ConnectWalletProps {
+  signInWithCrypto: () => Promise<void>;
+}
+
+export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const [showModal, setShowModal] = useState(false);
   const [showAccountsModal, setShowAccountsModal] = useState(false);
   const [polkadotAccounts, setPolkadotAccounts] = useState<
@@ -174,7 +178,10 @@ export default function Connect() {
             >
               Login with Polkadot
             </Button>
-            <Button className="w-full bg-gray-700 text-white p-2 rounded-lg">
+            <Button
+              onClick={signInWithCrypto}
+              className="w-full bg-gray-700 text-white p-2 rounded-lg"
+            >
               Login with MetaMask
             </Button>
           </div>

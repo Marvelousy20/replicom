@@ -12,8 +12,6 @@ import { UserContext } from "@/components/UseContext";
 import UserMenuDetail from "./userMenuDetail";
 import axios from "axios";
 import { useContext } from "react";
-// import ConnectWallet from "../ConnectPolka";
-// import ConnectWallet from "../ConnectWallet";
 import Connect from "../NewConnect";
 
 type userContextType = {
@@ -110,7 +108,7 @@ const UserMenu = () => {
       ) : (
         <div className="flex items-center">
           {/* <ConnectWallet signInWithCrypto={onSignInWithCrypto} /> */}
-          <Connect />
+          <Connect signInWithCrypto={onSignInWithCrypto} />
           <Dropdown menu={{ onClick }} overlayStyle={{ width: "150px" }}>
             <a onClick={(e) => e.preventDefault()}>
               <Space>
