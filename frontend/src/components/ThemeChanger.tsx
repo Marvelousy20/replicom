@@ -1,12 +1,22 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SunMoon, Moon, LaptopMinimal } from "lucide-react";
 
 export default function ThemeChanger() {
   const { theme, setTheme } = useTheme();
   const [dropDownOpen, setDropdownOpen] = useState(false);
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   const getIconForTheme = (themeName?: string) => {
     switch (themeName) {

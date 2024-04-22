@@ -20,20 +20,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.className} z-0 max-w-8xl mx-auto mt-[70px] dark:bg-light-dark text-white`}
       >
         <ThemeProvider
           enableSystem={true}
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
         >
           <PredictionProvider>
             <Providers>
               <MantineProvider>
-                <NavigationBar />
-                {children}
+                <main>
+                  <NavigationBar />
+                  {children}
+                </main>
               </MantineProvider>
             </Providers>
           </PredictionProvider>

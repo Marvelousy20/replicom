@@ -71,10 +71,6 @@ const Page = () => {
   };
 
   const { theme } = useTheme();
-  const paginationClass =
-    theme === "dark" ? "dark-pagination" : "light-pagination";
-
-  console.log(paginationClass);
 
   return (
     <>

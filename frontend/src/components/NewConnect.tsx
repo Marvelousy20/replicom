@@ -3,12 +3,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import {
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-  web3FromSource,
-} from "@polkadot/extension-dapp";
-import {
   InjectedAccountWithMeta,
   InjectedExtension,
 } from "@polkadot/extension-inject/types";
@@ -17,7 +11,7 @@ import Image from "next/image";
 import { WalletCards } from "lucide-react";
 import { signIn, getCsrfToken } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import { stringToHex } from "@polkadot/util";
 interface LoginParams {
   signature: string;
   message: string;
@@ -36,15 +30,32 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   >([]);
   const [selectedAccount, setSelectedAccount] =
     useState<InjectedAccountWithMeta | null>(null);
+
+  // const [connectedAccount, setConnectedAccount] =
+  //   useState<InjectedAccountWithMeta | null>(() => {
+  //     const savedAccount =
+  //       window !== undefined ? localStorage.getItem("connectedAccount") : null;
+  //     return savedAccount ? JSON.parse(savedAccount) : null;
+
+  //   });
   const [connectedAccount, setConnectedAccount] =
-    useState<InjectedAccountWithMeta | null>(() => {
-      const savedAccount = localStorage.getItem("connectedAccount");
-      return savedAccount ? JSON.parse(savedAccount) : null;
-    });
+    useState<InjectedAccountWithMeta | null>(null);
+
+  useEffect(() => {
+    const connectedAccount = localStorage.getItem(
+      "connectedAccount"
+    ) as InjectedAccountWithMeta | null;
+    if (connectedAccount) {
+      setConnectedAccount(connectedAccount);
+    }
+  }, []);
 
   const router = useRouter();
 
   const handleConnectPolkadot = async () => {
+    const { web3Enable, web3Accounts, web3FromSource } = await import(
+      "@polkadot/extension-dapp"
+    );
     const extensions = await web3Enable("openAI");
     if (extensions.length === 0) {
       alert("Please install the Polkadot{.js} extension.");
@@ -61,44 +72,54 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       }
       return;
     }
-
     setPolkadotAccounts(accounts);
     setShowModal(false);
     setShowAccountsModal(true);
   };
 
   const connectAccount = async () => {
+    const { web3FromSource, isWeb3Injected } = await import(
+      "@polkadot/extension-dapp"
+    );
+
     if (!selectedAccount) return;
 
+    console.log("IS WEB3 INJECTED", isWeb3Injected);
+
     localStorage.setItem("connectedAccount", JSON.stringify(selectedAccount));
+
     setConnectedAccount(selectedAccount);
     setShowAccountsModal(false);
     setSelectedAccount(null);
 
     try {
-      const injector = await web3FromSource(selectedAccount.meta.source);
+      const injector: InjectedExtension = await web3FromSource(
+        selectedAccount.meta.source
+      );
+      let signature = "";
+      const message = {
+        statement: "Sign in with polkadot extension",
+        uri: window.location.origin,
+        version: "1",
+        nonce: await getCsrfToken(),
+      };
+
       const signRaw = injector?.signer?.signRaw;
+      console.log(signRaw, "Selected accounts", selectedAccount);
 
-      if (signRaw) {
-        const message = {
-          statement:
-            "Sign in with polkadot extension to the example tokengated example dApp",
-          uri: window.location.origin,
-          nonce: await getCsrfToken(),
-          version: "1",
-        };
+      const hexMessage = stringToHex(JSON.stringify(message));
 
-        const messageObject = JSON.stringify(message);
-
-        const { signature } = await signRaw({
+      if (!!signRaw && !!selectedAccount) {
+        const data = await signRaw({
           address: selectedAccount.address,
-          data: JSON.stringify(message),
+          data: hexMessage,
           type: "bytes",
         });
 
+        // await cryptoWaitReady();
         await handleLogin({
-          signature,
-          message: messageObject,
+          signature: data.signature,
+          message: hexMessage,
           account: selectedAccount,
         });
       } else {
@@ -112,15 +133,17 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const handleLogin = async ({ signature, message, account }: LoginParams) => {
     const result = await signIn("polkadot", {
       redirect: false,
+      callbackUrl: "/",
       signature: signature,
+      name: account?.meta?.name,
       message: message,
-      address: account,
+      address: account?.address,
     });
 
     console.log(result);
 
     if (result?.url) {
-      router.push(result.url); // Redirect to a protected page or dashboard
+      router.push(result.url);
     } else {
       console.error("Login failed:", result?.error);
     }
@@ -138,6 +161,13 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
 
   const displayAddress = (address: string) =>
     address ? `${address.substring(0, 8)}...` : "No Address";
+
+  useEffect(() => {
+    const savedAccount = localStorage.getItem("connectedAccount");
+    if (savedAccount) {
+      setConnectedAccount(JSON.parse(savedAccount));
+    }
+  }, []);
 
   return (
     <div>
@@ -206,7 +236,6 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             {polkadotAccounts.map((account, index) => (
               <div
                 key={index}
-                // onClick={() => handleSelectAccount(account)}
                 className={`p-3 cursor-pointer border-2 rounded-lg ${
                   selectedAccount?.address === account.address
                     ? "border-green-500"

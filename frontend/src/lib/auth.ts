@@ -2,8 +2,13 @@ import { AuthOptions, RequestInternal } from "next-auth";
 import { ethers } from "ethers";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
-import { web3Accounts } from "@polkadot/extension-dapp";
-import { signatureVerify } from "@polkadot/util-crypto";
+import {
+  decodeAddress,
+  signatureVerify,
+  cryptoWaitReady,
+} from "@polkadot/util-crypto";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { hexToString } from "@polkadot/util";
 
 async function authorizeCrypto(
   credentials: Record<"walletAddress" | "signedNonce", string> | undefined,
@@ -39,20 +44,27 @@ async function authorizePolkadot(
     | Record<"message" | "signature" | "address" | "csrfToken", string>
     | undefined
 ) {
+  await cryptoWaitReady();
+
   if (!credentials) {
     return null;
   }
 
+  const provider = new WsProvider("wss://kusama-rpc.polkadot.io/");
+  const api = await ApiPromise.create({ provider });
+
   try {
-    const message = JSON.parse(credentials.message);
+    const messageHex = credentials.message;
+    const messageString = hexToString(messageHex);
+    const messaageJSON = JSON.parse(messageString);
 
     // Verify the message is from the same URI
-    if (message.uri !== process.env.NEXT_PUBLIC_NEXTAUTH_URL) {
+    if (messaageJSON.uri !== process.env.NEXT_PUBLIC_NEXTAUTH_URL) {
       return Promise.reject(new Error("🚫 You shall not pass! - URI mismatch"));
     }
 
     // Verify the message was not compromised
-    if (message.nonce !== credentials.csrfToken) {
+    if (messaageJSON.nonce !== credentials.csrfToken) {
       console.log("CSRF", credentials.csrfToken);
 
       return Promise.reject(
@@ -60,10 +72,21 @@ async function authorizePolkadot(
       );
     }
 
-    // Verify signature of the message
+    // const messageToString = JSON.stringify(message);
+    const publickKey = credentials.address;
+
     const { isValid } = signatureVerify(
-      credentials.message,
+      messageHex,
       credentials.signature,
+      publickKey
+    );
+
+    console.log(
+      "MESSAGE:",
+      messageHex,
+      "SIGNATURE",
+      credentials.signature,
+      "PUBLIC ADDRESS",
       credentials.address
     );
 
@@ -74,7 +97,7 @@ async function authorizePolkadot(
     // If all checks pass, return the user object
     return {
       id: credentials.address,
-      name: "Polkadot User", // Since you might not have a name, you can set a default or modify as needed
+      name: "Polkadot User",
       address: credentials.address,
     };
   } catch (e) {
@@ -82,6 +105,10 @@ async function authorizePolkadot(
     return null;
   }
 }
+
+// async function authorizePolkadots(credentials) {
+//   return { id: "dummy-id", name: "Dummy User", email: "dummy@example.com" };
+// }
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -103,6 +130,11 @@ export const authOptions: AuthOptions = {
         signature: { label: "Signature", type: "text" },
         address: { label: "Polkadot Address", type: "text" },
         csrfToken: { label: "CSRF Token", type: "text" }, // Added CSRF Token to credentials
+        name: {
+          label: "Name",
+          type: "text",
+          placeholder: "name",
+        },
       },
       authorize: authorizePolkadot,
     }),
@@ -113,5 +145,6 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  // secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
 };
