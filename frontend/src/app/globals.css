@@ -171,3 +171,26 @@
 .avatar-wrapper:hover .tooltip {
   visibility: visible;
 }
+
+.spinner .path {
+  stroke: #5652bf;
+  stroke-dasharray: 187;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes dash {
+  0% {
+      stroke-dasharray: 1, 187;
+      stroke-dashoffset: 0;
+  }
+  50% {
+      stroke-dasharray: 90, 187;
+      stroke-dashoffset: -35;
+  }
+  100% {
+      stroke-dasharray: 90, 187;
+      stroke-dashoffset: -124;
+  }
+}

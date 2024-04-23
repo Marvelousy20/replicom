@@ -17,6 +17,7 @@ interface LoginParams {
   message: string;
   account: InjectedAccountWithMeta;
 }
+import { signOut } from "next-auth/react";
 
 interface ConnectWalletProps {
   signInWithCrypto: () => Promise<void>;
@@ -31,15 +32,11 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const [selectedAccount, setSelectedAccount] =
     useState<InjectedAccountWithMeta | null>(null);
 
-  // const [connectedAccount, setConnectedAccount] =
-  //   useState<InjectedAccountWithMeta | null>(() => {
-  //     const savedAccount =
-  //       window !== undefined ? localStorage.getItem("connectedAccount") : null;
-  //     return savedAccount ? JSON.parse(savedAccount) : null;
-
-  //   });
   const [connectedAccount, setConnectedAccount] =
     useState<InjectedAccountWithMeta | null>(null);
+
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     const connectedAccount = localStorage.getItem(
@@ -143,6 +140,8 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
     console.log(result);
 
     if (result?.url) {
+      setMessageModalOpen(true);
+      setModalMessage("Logged in successfully!");
       router.push(result.url);
     } else {
       console.error("Login failed:", result?.error);
@@ -152,7 +151,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const toggleModal = () => {
     if (connectedAccount) {
       // If an account is connected, open the accounts modal directly
-      handleConnectPolkadot(); // This ensures accounts are loaded and modal is shown
+      handleConnectPolkadot();
     } else {
       // No account connected, show initial modal to connect
       setShowModal(true);
@@ -168,6 +167,15 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       setConnectedAccount(JSON.parse(savedAccount));
     }
   }, []);
+
+  const disconnectPolkadot = () => {
+    localStorage.removeItem("connectedAccount");
+    setConnectedAccount(null);
+    setShowAccountsModal(false);
+    setModalMessage("Disconnected successfully");
+    setMessageModalOpen(true);
+    signOut();
+  };
 
   return (
     <div>
@@ -254,6 +262,25 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             >
               Connect Now
             </Button>
+
+            {connectedAccount && (
+              <Button
+                className="w-full h-14 dark:bg-white dark:bg-opacity-90"
+                onClick={disconnectPolkadot}
+              >
+                Disconnect
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={messageModalOpen} onOpenChange={setMessageModalOpen}>
+        <DialogContent>
+          <DialogTitle>Notification</DialogTitle>
+          <p>{modalMessage}</p>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={() => setMessageModalOpen(false)}>Close</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -100,27 +100,26 @@ const UserMenu = () => {
         <div>
           {status === "authenticated" ? (
             <UserMenuDetail />
-          ) : (
-            <div className="flex items-center">
-              <Dropdown
-                menu={{ onClick, items }}
-                overlayStyle={{ width: "150px" }}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <Space>
-                    <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">
-                      <Image
-                        src="/img/user.svg"
-                        width={30}
-                        height={30}
-                        alt="user"
-                      />
-                    </div>
-                  </Space>
-                </a>
-              </Dropdown>
-            </div>
-          )}
+          ) : // <div className="flex items-center">
+          //   <Dropdown
+          //     menu={{ onClick, items }}
+          //     overlayStyle={{ width: "150px" }}
+          //   >
+          //     <a onClick={(e) => e.preventDefault()}>
+          //       <Space>
+          //         <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">
+          //           <Image
+          //             src="/img/user.svg"
+          //             width={30}
+          //             height={30}
+          //             alt="user"
+          //           />
+          //         </div>
+          //       </Space>
+          //     </a>
+          //   </Dropdown>
+          // </div>
+          null}
         </div>
       </div>
     </>

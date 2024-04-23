@@ -6,6 +6,7 @@ import axios from "axios";
 import { Pagination } from "antd";
 import SearchBar from "@/components/search-bar/search-bar";
 import { useTheme } from "next-themes";
+import Loader from "@/components/Loader";
 
 interface ModelProps {
   cover_image_url: string;
@@ -107,7 +108,9 @@ const Page = () => {
             </div>
           </>
         ) : (
-          <span className="md:px-10 px-5 text-[26px]">No modules...</span>
+          <span className="md:px-10 px-5 text-[26px]">
+            <Loader />
+          </span>
         )}
       </main>
     </>
