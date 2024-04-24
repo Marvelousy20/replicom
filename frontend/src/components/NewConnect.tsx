@@ -35,8 +35,8 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const [connectedAccount, setConnectedAccount] =
     useState<InjectedAccountWithMeta | null>(null);
 
-  const [messageModalOpen, setMessageModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  // const [messageModalOpen, setMessageModalOpen] = useState(false);
+  // const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     const connectedAccount = localStorage.getItem(
@@ -85,7 +85,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
 
     localStorage.setItem("connectedAccount", JSON.stringify(selectedAccount));
 
-    setConnectedAccount(selectedAccount);
+    // setConnectedAccount(selectedAccount);
     setShowAccountsModal(false);
     setSelectedAccount(null);
 
@@ -102,7 +102,6 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       };
 
       const signRaw = injector?.signer?.signRaw;
-      console.log(signRaw, "Selected accounts", selectedAccount);
 
       const hexMessage = stringToHex(JSON.stringify(message));
 
@@ -137,13 +136,15 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       address: account?.address,
     });
 
-    console.log(result);
+    console.log("RESULT URL", result?.url);
 
     if (result?.url) {
-      setMessageModalOpen(true);
-      setModalMessage("Logged in successfully!");
+      // setMessageModalOpen(true);
+      // setModalMessage("Logged in successfully!");
       router.push(result.url);
+      setSelectedAccount(account);
     } else {
+      alert(result?.error);
       console.error("Login failed:", result?.error);
     }
   };
@@ -172,8 +173,8 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
     localStorage.removeItem("connectedAccount");
     setConnectedAccount(null);
     setShowAccountsModal(false);
-    setModalMessage("Disconnected successfully");
-    setMessageModalOpen(true);
+    // setModalMessage("Disconnected successfully");
+    // setMessageModalOpen(true);
     signOut();
   };
 
@@ -275,7 +276,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={messageModalOpen} onOpenChange={setMessageModalOpen}>
+      {/* <Dialog open={messageModalOpen} onOpenChange={setMessageModalOpen}>
         <DialogContent>
           <DialogTitle>Notification</DialogTitle>
           <p>{modalMessage}</p>
@@ -283,7 +284,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             <Button onClick={() => setMessageModalOpen(false)}>Close</Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }

@@ -66,7 +66,6 @@ async function authorizePolkadot(
     // Verify the message was not compromised
     if (messaageJSON.nonce !== credentials.csrfToken) {
       console.log("CSRF", credentials.csrfToken);
-
       return Promise.reject(
         new Error("🚫 You shall not pass! - CSRF token mismatch")
       );
@@ -79,15 +78,6 @@ async function authorizePolkadot(
       messageHex,
       credentials.signature,
       publickKey
-    );
-
-    console.log(
-      "MESSAGE:",
-      messageHex,
-      "SIGNATURE",
-      credentials.signature,
-      "PUBLIC ADDRESS",
-      credentials.address
     );
 
     if (!isValid) {
@@ -145,6 +135,6 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  // secret: process.env.NEXTAUTH_SECRET,
+
   secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
 };

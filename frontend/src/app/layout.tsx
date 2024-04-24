@@ -25,9 +25,10 @@ export default function RootLayout({
         className={`${inter.className} z-0 max-w-8xl mx-auto mt-[70px] dark:bg-light-dark text-white`}
       >
         <ThemeProvider
-          enableSystem={true}
+          enableSystem={false}
           attribute="class"
           defaultTheme="dark"
+          enableColorScheme
         >
           <PredictionProvider>
             <Providers>

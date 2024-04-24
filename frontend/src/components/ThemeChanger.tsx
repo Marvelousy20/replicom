@@ -24,8 +24,8 @@ export default function ThemeChanger() {
         return <SunMoon fill="black" color="black" stroke="black" />;
       case "dark":
         return <Moon fill="white" />;
-      case "system":
-        return <LaptopMinimal />;
+      // case "system":
+      //   return <LaptopMinimal fill="none" />;
       default:
         return <SunMoon />;
     }
@@ -74,7 +74,7 @@ export default function ThemeChanger() {
             <span>Dark</span>
           </button>
 
-          <button
+          {/* <button
             onClick={() => {
               setTheme("system");
               setDropdownOpen(false);
@@ -87,7 +87,7 @@ export default function ThemeChanger() {
               <LaptopMinimal />
             </span>
             <span>System</span>
-          </button>
+          </button> */}
         </div>
       )}
     </div>

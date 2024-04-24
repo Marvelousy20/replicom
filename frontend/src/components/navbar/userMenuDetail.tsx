@@ -19,6 +19,7 @@ const UserMenuDetail = () => {
         break;
       case "4":
         localStorage.removeItem("userData");
+        localStorage.removeItem("connectedAccount");
         signOut();
         break;
       default:
