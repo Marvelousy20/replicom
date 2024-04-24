@@ -143,6 +143,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       // setModalMessage("Logged in successfully!");
       router.push(result.url);
       setSelectedAccount(account);
+      setConnectedAccount(account);
     } else {
       alert(result?.error);
       console.error("Login failed:", result?.error);
