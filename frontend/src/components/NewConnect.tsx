@@ -18,6 +18,7 @@ interface LoginParams {
   account: InjectedAccountWithMeta;
 }
 import { signOut } from "next-auth/react";
+import axios from "axios";
 
 interface ConnectWalletProps {
   signInWithCrypto: () => Promise<void>;
@@ -127,6 +128,16 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
           type: "bytes",
         });
 
+        const response = await axios.get(
+          `/api/user?walletAddress=${selectedAccount.address}`
+        );
+        const currentUser = {
+          walletAddress: response.data.walletAddress,
+          AvatarUrl: response.data.profile_img,
+        };
+
+        console.log(currentUser);
+
         // await cryptoWaitReady();
         await handleLogin({
           signature: data.signature,
@@ -154,8 +165,6 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
     console.log("RESULT URL", result?.url);
 
     if (result?.url) {
-      // setMessageModalOpen(true);
-      // setModalMessage("Logged in successfully!");
       router.push(result.url);
       setSelectedAccount(account);
       setConnectedAccount(account);
