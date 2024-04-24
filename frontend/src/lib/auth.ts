@@ -63,6 +63,8 @@ async function authorizePolkadot(
       return Promise.reject(new Error("🚫 You shall not pass! - URI mismatch"));
     }
 
+    console.log("ENVIRONMENT", process.env.NEXT_PUBLIC_NEXTAUTH_URL);
+
     // Verify the message was not compromised
     if (messaageJSON.nonce !== credentials.csrfToken) {
       console.log("CSRF", credentials.csrfToken);

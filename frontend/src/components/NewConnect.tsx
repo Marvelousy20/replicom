@@ -23,9 +23,15 @@ interface ConnectWalletProps {
   signInWithCrypto: () => Promise<void>;
 }
 
+interface MetaProps {
+  walletAddress: string | undefined;
+  AvatarUrl: string;
+}
+
 export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   const [showModal, setShowModal] = useState(false);
   const [showAccountsModal, setShowAccountsModal] = useState(false);
+
   const [polkadotAccounts, setPolkadotAccounts] = useState<
     InjectedAccountWithMeta[]
   >([]);
@@ -38,13 +44,22 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
   // const [messageModalOpen, setMessageModalOpen] = useState(false);
   // const [modalMessage, setModalMessage] = useState("");
 
+  // Handles Metamask
+  const [userData, setUserData] = useState<MetaProps | null>(null);
+
+  // HandlesMetamask modal
+  const [showMetamaskModal, setShowMetamaskModal] = useState(false);
+
   useEffect(() => {
     const connectedAccount = localStorage.getItem(
       "connectedAccount"
     ) as InjectedAccountWithMeta | null;
-    if (connectedAccount) {
-      setConnectedAccount(connectedAccount);
-    }
+    // if (connectedAccount) {
+    //   setConnectedAccount(connectedAccount);
+    // }
+
+    const userDataLocal = localStorage.getItem("userData");
+    if (userDataLocal) setUserData(JSON.parse(userDataLocal));
   }, []);
 
   const router = useRouter();
@@ -154,13 +169,15 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
     if (connectedAccount) {
       // If an account is connected, open the accounts modal directly
       handleConnectPolkadot();
+    } else if (userData) {
+      setShowMetamaskModal(true);
     } else {
       // No account connected, show initial modal to connect
       setShowModal(true);
     }
   };
 
-  const displayAddress = (address: string) =>
+  const displayAddress = (address?: string) =>
     address ? `${address.substring(0, 8)}...` : "No Address";
 
   useEffect(() => {
@@ -174,14 +191,18 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
     localStorage.removeItem("connectedAccount");
     setConnectedAccount(null);
     setShowAccountsModal(false);
-    // setModalMessage("Disconnected successfully");
-    // setMessageModalOpen(true);
+    signOut();
+  };
+
+  const disconnectMetamask = () => {
+    localStorage.removeItem("userData");
+    setShowMetamaskModal(false);
     signOut();
   };
 
   return (
     <div>
-      {connectedAccount ? (
+      {connectedAccount || userData ? (
         <Button
           onClick={toggleModal}
           className="h-15 relative inline-flex items-center justify-center gap-3 rounded-2xl border-2 border-orange-500 bg-white px-4 py-2 shadow-custom-orange active:top-1 active:shadow-custom-orange-clicked dark:bg-light-dark"
@@ -192,10 +213,14 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             </div>
             <div>
               <p className="font-bold text-orange-400 text-sm">
-                {connectedAccount.meta.name}
+                {connectedAccount
+                  ? connectedAccount.meta.name
+                  : "MetaMask User"}
               </p>
               <p className="text-xs text-orange-500">
-                {displayAddress(connectedAccount.address)}
+                {connectedAccount
+                  ? displayAddress(connectedAccount?.address)
+                  : displayAddress(userData?.walletAddress)}
               </p>
             </div>
           </div>
@@ -277,15 +302,27 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
         </DialogContent>
       </Dialog>
 
-      {/* <Dialog open={messageModalOpen} onOpenChange={setMessageModalOpen}>
-        <DialogContent>
-          <DialogTitle>Notification</DialogTitle>
-          <p>{modalMessage}</p>
-          <div className="flex justify-end space-x-2">
-            <Button onClick={() => setMessageModalOpen(false)}>Close</Button>
+      <Dialog open={showMetamaskModal} onOpenChange={setShowMetamaskModal}>
+        <DialogContent className="bg-white text-black dark:bg-[#131B2A] dark:text-white">
+          <DialogTitle className="flex gap-2 items-center mb-6 font-bold text-2xl">
+            MetaMask Wallet Connected
+          </DialogTitle>
+          <div className="space-y-4">
+            <div
+              className={`p-3 cursor-pointer border-2 rounded-lg border-green-500`}
+            >
+              <p className="text-lg">{userData?.walletAddress}</p>
+            </div>
+
+            <Button
+              className="w-full h-14 dark:bg-white dark:bg-opacity-90"
+              onClick={disconnectMetamask}
+            >
+              Disconnect
+            </Button>
           </div>
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   );
 }

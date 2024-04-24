@@ -1,17 +1,13 @@
 "use client";
-import { AiOutlineMenu } from "react-icons/ai";
-import { useRouter } from "next/navigation";
 import { signOut, signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { IoReorderThreeOutline } from "react-icons/io5";
-import type { MenuProps } from "antd";
-import { Dropdown, message, Space } from "antd";
 import { ethers } from "ethers";
 import { User } from "next-auth";
 import { UserContext } from "@/components/UseContext";
 import UserMenuDetail from "./userMenuDetail";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Connect from "../NewConnect";
 
 type userContextType = {
@@ -78,49 +74,15 @@ const UserMenu = () => {
     }
   }
 
-  const onClick: MenuProps["onClick"] = ({ key }) => {
-    if (key == "1") {
-      onSignInWithCrypto();
-    }
-  };
-
-  const items: MenuProps["items"] = [
-    {
-      label: "Sign In",
-      key: "1",
-    },
-  ];
-
-  console.log(status);
+  useEffect(() => {
+    console.log("component reupdates");
+  }, []);
 
   return (
     <>
       <div className="flex items-center">
         <Connect signInWithCrypto={onSignInWithCrypto} />
-        <div>
-          {status === "authenticated" ? (
-            <UserMenuDetail />
-          ) : // <div className="flex items-center">
-          //   <Dropdown
-          //     menu={{ onClick, items }}
-          //     overlayStyle={{ width: "150px" }}
-          //   >
-          //     <a onClick={(e) => e.preventDefault()}>
-          //       <Space>
-          //         <div className="rounded-lg flex gap-x-[4px] items-center border-w-[100px] px-[20px] py-[3px]  hover:cursor-pointer hover:opacity-60">
-          //           <Image
-          //             src="/img/user.svg"
-          //             width={30}
-          //             height={30}
-          //             alt="user"
-          //           />
-          //         </div>
-          //       </Space>
-          //     </a>
-          //   </Dropdown>
-          // </div>
-          null}
-        </div>
+        <div>{status === "authenticated" ? <UserMenuDetail /> : null}</div>
       </div>
     </>
   );
