@@ -14,9 +14,9 @@ const UserMenuDetail = () => {
       case "2":
         router.push("/prediction");
         break;
-      case "3":
-        router.push("/profile");
-        break;
+      // case "3":
+      //   router.push("/profile");
+      //   break;
       case "4":
         localStorage.removeItem("userData");
         localStorage.removeItem("connectedAccount");
@@ -32,13 +32,13 @@ const UserMenuDetail = () => {
       label: "Prediction",
       key: "2",
     },
-    {
-      type: "divider",
-    },
-    {
-      label: "Profile",
-      key: "3",
-    },
+    // {
+    //   type: "divider",
+    // },
+    // {
+    //   label: "Profile",
+    //   key: "3",
+    // },
     {
       type: "divider",
     },

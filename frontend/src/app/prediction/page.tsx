@@ -34,7 +34,7 @@ const Prediction = () => {
   }, []);
 
   return (
-    <div className="px-[30px] py-[20px] dark:bg-[#212324] dark:text-white mb-[10px] my-auto min-h-[860px]">
+    <div className="px-[30px] py-[20px] dark:bg-[#212324] dark:text-white mb-[10px] my-auto min-h-[860px] text-black">
       <h1 className="text-[25px]">Recent predictions</h1>
       <table className="w-full mt-[20px] ">
         <thead>

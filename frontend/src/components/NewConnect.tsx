@@ -244,22 +244,33 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
       )}
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="bg-white text-black dark:bg-[#131B2A] dark:text-white">
+        <DialogContent className="bg-[#131B2A] text-white">
           <DialogTitle className="text-xl font-bold">
             Connect Wallet
+            <p className="text-[15px] text-gray-500 font-sans pb-[20px]">
+              You need to connect wallet to log in.
+            </p>
+            <hr></hr>
           </DialogTitle>
           <div className="space-y-4 p-4">
             <Button
               onClick={handleConnectPolkadot}
-              className="w-full bg-orange-500 text-white p-2 rounded-lg"
+              className="w-full bg-[#131B2A] rounded-lg hover:bg-[#131B2A] hover:opacity-60  border-[1px] py-[35px] border-gray-400"
             >
-              Login with Polkadot
+              <div className="flex gap-x-[10px] items-center ">
+                <Image src={"/img/polkadot.png"} width={40} height={40} alt="meta" className="" />
+                <h1 className="text-white text-[18px]">Polkadot</h1>
+              </div>
             </Button>
+
             <Button
               onClick={signInWithCrypto}
-              className="w-full bg-gray-700 text-white p-2 rounded-lg"
+              className="w-full bg-[#131B2A] rounded-lg  hover:bg-[#131B2A] hover:opacity-60  border-[1px] py-[35px] border-gray-400"
             >
-              Login with MetaMask
+              <div className="flex gap-x-[10px] items-center ">
+                <Image src={"/img/metamask.svg"} width={40} height={40} alt="meta" className="" />
+                <h1 className="text-white text-[18px]">MetaMask</h1>
+              </div>
             </Button>
           </div>
         </DialogContent>
@@ -280,11 +291,10 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             {polkadotAccounts.map((account, index) => (
               <div
                 key={index}
-                className={`p-3 cursor-pointer border-2 rounded-lg ${
-                  selectedAccount?.address === account.address
-                    ? "border-green-500"
-                    : "border-black dark:border-white"
-                }`}
+                className={`p-3 cursor-pointer border-2 rounded-lg ${selectedAccount?.address === account.address
+                  ? "border-green-500"
+                  : "border-black dark:border-white"
+                  }`}
                 onClick={() => setSelectedAccount(account)}
               >
                 <p className="font-bold text-lg">{account.meta.name}</p>

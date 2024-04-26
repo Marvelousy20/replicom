@@ -24,7 +24,7 @@ export default function ModelItem({
   };
 
   return (
-    <div className="w-[350px] h-[420px] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.16)] rounded-b-[7px] rounded-t-[7px] bg-slate-200">
+    <div className="w-[350px] h-[420px] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.16)] rounded-b-[7px] rounded-t-[7px] bg-slate-200 dark:bg-gray-800">
       <div className="relative z-0 flex flex-col ">
         <div
           className="cursor-pointer absolute w-full h-[350px]"
@@ -35,30 +35,30 @@ export default function ModelItem({
           {cover_image_url ? (
             <Image
               src={cover_image_url}
-              layout="fill"
-              objectFit="cover"
+              width={500}
+              height={350}
               alt="Image"
-              className="rounded-t-[7px]"
+              className="rounded-t-[7px] w-full h-[350px]"
             />
           ) : (
             <Image
-              className="hidden"
-              src={""}
-              layout="fill"
-              objectFit="cover"
+              className="rounded-t-[7px] w-full  hidden"
+              src={"/img/logo.svg"}
+              width={500}
+              height={350}
               alt="Image"
             />
           )}
         </div>
         <div>
-          <h4 className="absolute top-[370px] left-[10px] max-w-full truncate  font-bold text-gray-800 text-xl w-[250px]">
+          <h4 className="absolute top-[370px] left-[10px] max-w-full truncate  font-bold text-gray-800 text-xl w-[250px] dark:text-white">
             {name}
           </h4>
         </div>
 
         <div className="flex gap-x-[10px] items-center absolute  top-[375px] right-[10px]">
           <FaGithub
-            className="text-gray-800 w-[20px] h-[20px] cursor-pointer"
+            className="text-gray-800 w-[20px] h-[20px] cursor-pointer dark:text-white"
             onClick={() => onClickGitHubHandle()}
           />
         </div>

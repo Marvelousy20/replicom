@@ -29,8 +29,8 @@ const Page = () => {
   useEffect(() => {
     const filtered = searchString
       ? loadedModules.filter((module) =>
-          module.name?.toLowerCase().includes(searchString.toLowerCase())
-        )
+        module.name?.toLowerCase().includes(searchString.toLowerCase())
+      )
       : loadedModules;
     setFilteredModules(filtered);
     if (searchString) {
@@ -75,7 +75,7 @@ const Page = () => {
 
   return (
     <>
-      <main className="mt-[120px] h-full w-full bg-[url(/img/dots-bg.svg)] dark:bg-[url(/img/dot-bg-dark.svg)] py-20">
+      <main className="mt-[120px] h-full w-full bg-[url(/img/dots-bg.svg)] dark:bg-[url(/img/dot-bg-dark.svg)] ">
         <div className="md:px-10 px-5">
           {/* <SearchBar
             setSearchString={setSearchString}
@@ -85,7 +85,7 @@ const Page = () => {
 
         {displayedModules && displayedModules.length > 0 ? (
           <>
-            <div className="flex flex-wrap gap-y-10 gap-x-4 justify-between md:px-10 px-5">
+            <div className="flex flex-wrap gap-y-10 gap-x-4 justify-center md:px-10 px-5 lg:justify-between">
               {displayedModules.map((model, idx) => (
                 <ModelItem
                   key={idx}
