@@ -46,13 +46,17 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
   }, []);
 
   const initialFormData = Object.fromEntries(
-    Object.entries(schema.Input.properties).map(([key, field]) => [
+    Object.entries(schema?.Input?.properties ?? {}).map(([key, field]) => [
       key,
       field.default !== undefined ? field.default : "",
     ])
   );
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
+
+  console.log("SCHEMA", schema.Input);
+  console.log("FORM DATA", formData);
+
   // const [predictions, setPrediction] = useState(null);
   const [error, setError] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: string }>(
@@ -128,30 +132,71 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setShowInitialImage(false);
     const sanitizedFormData: FormData = {};
 
+    // for (const [key, value] of Object.entries(formData)) {
+    //   if (
+    //     schema.Input.properties[key]?.type === "integer" ||
+    //     schema.Input.properties[key]?.allOf
+    //     // schema.Input.properties[key]?.type === "number"
+    //   ) {
+    //     if (value === "") {
+    //       sanitizedFormData[key] = 0;
+    //     } else {
+    //       const intValue = parseInt(value as string, 10);
+    //       if (!isNaN(intValue) && Number.isInteger(intValue)) {
+    //         sanitizedFormData[key] = intValue;
+    //       } else {
+    //         sanitizedFormData[key] = value;
+    //         // Handle the case where the value is not a valid integer
+    //         console.error(`Invalid integer value for ${key}: ${value}`);
+    //       }
+    //     }
+    //   } else {
+    //     sanitizedFormData[key] = value;
+    //   }
+    // }
+
     for (const [key, value] of Object.entries(formData)) {
-      if (
-        schema.Input.properties[key]?.type === "integer" ||
-        schema.Input.properties[key]?.allOf ||
-        schema.Input.properties[key]?.type === "number"
-      ) {
+      const property = schema.Input.properties[key];
+      if (!property) continue; // Skip keys that aren't defined in the schema
+
+      const isAllOfInteger = property.allOf !== undefined;
+      const isRequired = schema.Input.required?.includes(key);
+
+      if (!isRequired && value === "") continue;
+
+      if (property.type === "number" && !isAllOfInteger) {
         if (value === "") {
-          sanitizedFormData[key] = 0;
+          sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
+        } else {
+          const numValue = parseFloat(value as string); // Use parseFloat for type "number"
+          if (!isNaN(numValue)) {
+            sanitizedFormData[key] = numValue;
+          } else {
+            sanitizedFormData[key] = value; // Preserve original value if conversion fails
+            console.error(`Invalid number value for ${key}: ${value}`);
+          }
+        }
+      } else if (property.type === "integer" || isAllOfInteger) {
+        if (value === "") {
+          sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
         } else {
           const intValue = parseInt(value as string, 10);
           if (!isNaN(intValue) && Number.isInteger(intValue)) {
             sanitizedFormData[key] = intValue;
           } else {
-            sanitizedFormData[key] = value;
-            // Handle the case where the value is not a valid integer
+            sanitizedFormData[key] = value; // Preserve original value if conversion fails
             console.error(`Invalid integer value for ${key}: ${value}`);
           }
         }
       } else {
-        sanitizedFormData[key] = value;
+        sanitizedFormData[key] = value; // Directly assign for all other types
       }
     }
 
     const requestBody = { version, input: sanitizedFormData };
+
+    console.log("SANITIZED INPUT", sanitizedFormData);
+    console.log("SCHEMA", schema.Input);
 
     try {
       const response = await fetch("/api/output", {
@@ -221,27 +266,6 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     } catch (error) {
       console.error(error);
     }
-
-    // const predictionId = predictionData.id;
-
-    // while (
-    //   prediction.status !== "succeeded" &&
-    //   prediction.status !== "failed" &&
-    //   prediction.status !== "canceled"
-    // ) {
-    //   await sleep(3000);
-    //   const response = await fetch(`/api/output?id=${predictionId}`);
-    //   prediction = await response.json();
-    //   if (response.status !== 200) {
-    //     setError(prediction.detail);
-    //     return;
-    //   }
-    //   setPrediction(prediction);
-    //   const data: Prediction = await response.json();
-    //   updatePrediction(data);
-    //   // setGlobalPredictions(prediction);
-    //   // console.log("GLOBAL PREDICTION IN FORM", globalPredictions);
-    // }
   };
 
   const handleReset = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -282,7 +306,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 relative">
-      {Object.entries(schema.Input?.properties)
+      {Object.entries(schema.Input?.properties ?? {})
         .sort(([, a], [, b]) => (a["x-order"] || 0) - (b["x-order"] || 0))
         .map(([key, field]) => {
           const isRequired = schema.Input?.required?.includes(key);
@@ -415,9 +439,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                   onChange={(event) => handleInputChange(event, key)}
                   required={isRequired}
                   className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
-                  min={field.minimum || undefined} // Optional: Set minimum value if defined
-                  max={field.maximum || undefined} // Optional: Set maximum value if defined
-                  step="1" // Ensure only whole numbers are allowed
+                  min={field.minimum || undefined}
+                  max={field.maximum || undefined}
+                  step="1"
                 />
               ) : (
                 <input
@@ -450,12 +474,10 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
           </div>
           <div
             className={`bg-black dark:bg-slate-700 text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
-              isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
+              isButtonEnabled ? "" : ""
             }`}
           >
-            <button type="submit" disabled={!isButtonEnabled}>
-              Boot + Runs
-            </button>
+            <button type="submit">Boot + Runs</button>
           </div>
         </div>
       </div>

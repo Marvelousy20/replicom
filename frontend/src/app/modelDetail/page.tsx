@@ -151,8 +151,45 @@ export default function ModelDetails() {
     }
   };
 
+  // Check if the output is a URL or structured data
+
+  const renderOutput = (output: any) => {
+    if (Array.isArray(output)) {
+      return output.map((item, index) => (
+        <div key={index}>{renderOutput(item)}</div>
+      ));
+    } else if (
+      typeof output === "string" &&
+      (output.startsWith("http://") || output.startsWith("https://"))
+    ) {
+      return renderMedia(output);
+    } else if (typeof output === "object" && output !== null) {
+      return <pre>{JSON.stringify(output, null, 2)}</pre>; // JSON formatting for objects
+    } else {
+      return <span>{output}</span>;
+    }
+  };
+
+  const renderMedia = (url: string) => {
+    if (url.match(/\.(mp4|webm|ogg)$/i)) {
+      return (
+        <video controls width="700" height="400">
+          <source src={url} type={`video/${url.split(".").pop()}`} />
+        </video>
+      );
+    } else if (url.match(/\.(mp3|wav|ogg)$/i)) {
+      return (
+        <audio controls>
+          <source src={url} type={`audio/${url.split(".").pop()}`} />
+        </audio>
+      );
+    } else {
+      return <Image src={url} alt="Output" width={700} height={400} />;
+    }
+  };
+
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <div className="flex flex-col items-center w-full text-black dark:text-white">
         <div className="px-4 lg:px-16 w-full">
           {/* <div className="mb-4 inline-flex" onClick={handleBack}>
@@ -193,79 +230,7 @@ export default function ModelDetails() {
                     priority
                   />
                 ) : (
-                  prediction?.output && (
-                    <div>
-                      {Array.isArray(prediction?.output) ? (
-                        prediction.output.map((url, index) => (
-                          <div key={index}>
-                            {url.endsWith(".mp4") ||
-                            url.endsWith(".webm") ||
-                            url.endsWith(".ogg") ? (
-                              // Render a video element if the URL ends with a video file extension
-                              <video controls width="700" height="400">
-                                <source src={url} type="video/mp4" />
-                                Your browser does not support the video tag.
-                              </video>
-                            ) : url.endsWith(".mp3") ||
-                              url.endsWith(".wav") ||
-                              url.endsWith(".ogg") ? (
-                              // Render an audio element if the URL ends with an audio file extension
-                              <audio controls>
-                                <source src={url} type="audio/mpeg" />
-                                Your browser does not support the audio element.
-                              </audio>
-                            ) : (
-                              // Render an image element otherwise
-                              <Image
-                                src={url}
-                                alt={`image ${index + 1}`}
-                                width={700}
-                                height={400}
-                              />
-                            )}
-                          </div>
-                        ))
-                      ) : (
-                        <div>
-                          {prediction.output.endsWith(".mp4") ||
-                          prediction.output.endsWith(".webm") ||
-                          prediction.output.endsWith(".ogg") ? (
-                            // Render a video element if the URL ends with a video file extension
-                            <video controls width="700" height="400">
-                              <source
-                                src={prediction.output}
-                                type="video/mp4"
-                              />
-                              Your browser does not support the video tag.
-                            </video>
-                          ) : prediction.output.endsWith(".mp3") ||
-                            prediction.output.endsWith(".wav") ||
-                            prediction.output.endsWith(".ogg") ? (
-                            // Render an audio element if the URL ends with an audio file extension
-                            <audio controls>
-                              <source
-                                src={prediction.output}
-                                type="audio/mpeg"
-                              />
-                              Your browser does not support the audio element.
-                            </audio>
-                          ) : (
-                            // Render an image element otherwise
-                            <Image
-                              src={prediction.output}
-                              alt="image"
-                              width={700}
-                              height={400}
-                            />
-                          )}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-4">
-                        predict_time: {prediction?.metrics?.predict_time}{" "}
-                        seconds
-                      </div>
-                    </div>
-                  )
+                  prediction?.output && renderOutput(prediction.output)
                 )}
 
                 {prediction?.id ? (
