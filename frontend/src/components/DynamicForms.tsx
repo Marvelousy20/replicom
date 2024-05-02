@@ -132,64 +132,66 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
     setShowInitialImage(false);
     const sanitizedFormData: FormData = {};
 
-    // for (const [key, value] of Object.entries(formData)) {
-    //   if (
-    //     schema.Input.properties[key]?.type === "integer" ||
-    //     schema.Input.properties[key]?.allOf
-    //     // schema.Input.properties[key]?.type === "number"
-    //   ) {
-    //     if (value === "") {
-    //       sanitizedFormData[key] = 0;
-    //     } else {
-    //       const intValue = parseInt(value as string, 10);
-    //       if (!isNaN(intValue) && Number.isInteger(intValue)) {
-    //         sanitizedFormData[key] = intValue;
-    //       } else {
-    //         sanitizedFormData[key] = value;
-    //         // Handle the case where the value is not a valid integer
-    //         console.error(`Invalid integer value for ${key}: ${value}`);
-    //       }
-    //     }
-    //   } else {
-    //     sanitizedFormData[key] = value;
-    //   }
-    // }
-
     for (const [key, value] of Object.entries(formData)) {
       const property = schema.Input.properties[key];
       if (!property) continue; // Skip keys that aren't defined in the schema
 
-      const isAllOfInteger = property.allOf !== undefined;
       const isRequired = schema.Input.required?.includes(key);
+      if (!isRequired && value === "") continue; // Skip empty non-required values
 
-      if (!isRequired && value === "") continue;
+      // Check if default property exists and handle type based on its type
+      if ("default" in property) {
+        const defaultValue = property.default;
+        const valueType = typeof defaultValue;
 
-      if (property.type === "number" && !isAllOfInteger) {
-        if (value === "") {
-          sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
-        } else {
-          const numValue = parseFloat(value as string); // Use parseFloat for type "number"
-          if (!isNaN(numValue)) {
-            sanitizedFormData[key] = numValue;
+        if (valueType === "number") {
+          if (value === "") {
+            sanitizedFormData[key] = defaultValue as any; // Use default if the value is empty
           } else {
-            sanitizedFormData[key] = value; // Preserve original value if conversion fails
-            console.error(`Invalid number value for ${key}: ${value}`);
+            const numValue = parseFloat(value as string); // Parse value as float
+            if (!isNaN(numValue)) {
+              // Use Math.floor only if the type is explicitly integer
+              sanitizedFormData[key] =
+                property.type === "integer" ? Math.floor(numValue) : numValue;
+            } else {
+              sanitizedFormData[key] = value; // Preserve original value if conversion fails
+              console.error(`Invalid number value for ${key}: ${value}`);
+            }
           }
-        }
-      } else if (property.type === "integer" || isAllOfInteger) {
-        if (value === "") {
-          sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
+        } else if (valueType === "string") {
+          sanitizedFormData[key] = value; // Assign directly for strings
         } else {
-          const intValue = parseInt(value as string, 10);
-          if (!isNaN(intValue) && Number.isInteger(intValue)) {
-            sanitizedFormData[key] = intValue;
-          } else {
-            sanitizedFormData[key] = value; // Preserve original value if conversion fails
-            console.error(`Invalid integer value for ${key}: ${value}`);
-          }
+          sanitizedFormData[key] = value; // Assign directly for other types, though typically not expected
         }
       } else {
-        sanitizedFormData[key] = value; // Directly assign for all other types
+        // Fallback to original type handling if there is no default
+        if (property.type === "number") {
+          if (value === "") {
+            sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
+          } else {
+            const numValue = parseFloat(value as string); // Use parseFloat for type "number"
+            if (!isNaN(numValue)) {
+              sanitizedFormData[key] = numValue; // Directly assign for numbers, no need to check for integer
+            } else {
+              sanitizedFormData[key] = value; // Preserve original value if conversion fails
+              console.error(`Invalid number value for ${key}: ${value}`);
+            }
+          }
+        } else if (property.type === "integer") {
+          if (value === "") {
+            sanitizedFormData[key] = 0; // Assuming a default of 0 for empty strings if needed
+          } else {
+            const intValue = parseInt(value as string, 10);
+            if (!isNaN(intValue) && Number.isInteger(intValue)) {
+              sanitizedFormData[key] = intValue;
+            } else {
+              sanitizedFormData[key] = value; // Preserve original value if conversion fails
+              console.error(`Invalid integer value for ${key}: ${value}`);
+            }
+          }
+        } else {
+          sanitizedFormData[key] = value; // Directly assign for all other types
+        }
       }
     }
 
@@ -385,7 +387,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     name={key}
                     checked={formData[key] as boolean} // Cast to boolean since formData[key] is boolean
                     onChange={(event) => handleBooleanInputChange(event, key)}
-                  // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                    // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                   />
                   <div>{field.description}</div>
                 </div>
@@ -473,10 +475,13 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
             Reset
           </div>
           <div
-            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
-              }`}
+            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
+              isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
+            }`}
           >
-            <button type="submit" disabled={!isButtonEnabled}>Boot + Runs</button>
+            <button type="submit" disabled={!isButtonEnabled}>
+              Boot + Runs
+            </button>
           </div>
         </div>
       </div>
