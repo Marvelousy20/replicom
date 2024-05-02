@@ -136,6 +136,7 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
           AvatarUrl: response.data.profile_img,
         };
 
+        localStorage.setItem("userData", JSON.stringify(currentUser));
         console.log(currentUser);
 
         // await cryptoWaitReady();
@@ -258,7 +259,13 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
               className="w-full bg-[#131B2A] rounded-lg hover:bg-[#131B2A] hover:opacity-60  border-[1px] py-[35px] border-gray-400"
             >
               <div className="flex gap-x-[10px] items-center ">
-                <Image src={"/img/polkadot.png"} width={40} height={40} alt="meta" className="" />
+                <Image
+                  src={"/img/polkadot.png"}
+                  width={40}
+                  height={40}
+                  alt="meta"
+                  className=""
+                />
                 <h1 className="text-white text-[18px]">Polkadot</h1>
               </div>
             </Button>
@@ -268,7 +275,13 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
               className="w-full bg-[#131B2A] rounded-lg  hover:bg-[#131B2A] hover:opacity-60  border-[1px] py-[35px] border-gray-400"
             >
               <div className="flex gap-x-[10px] items-center ">
-                <Image src={"/img/metamask.svg"} width={40} height={40} alt="meta" className="" />
+                <Image
+                  src={"/img/metamask.svg"}
+                  width={40}
+                  height={40}
+                  alt="meta"
+                  className=""
+                />
                 <h1 className="text-white text-[18px]">MetaMask</h1>
               </div>
             </Button>
@@ -291,10 +304,11 @@ export default function Connect({ signInWithCrypto }: ConnectWalletProps) {
             {polkadotAccounts.map((account, index) => (
               <div
                 key={index}
-                className={`p-3 cursor-pointer border-2 rounded-lg ${selectedAccount?.address === account.address
-                  ? "border-green-500"
-                  : "border-black dark:border-white"
-                  }`}
+                className={`p-3 cursor-pointer border-2 rounded-lg ${
+                  selectedAccount?.address === account.address
+                    ? "border-green-500"
+                    : "border-black dark:border-white"
+                }`}
                 onClick={() => setSelectedAccount(account)}
               >
                 <p className="font-bold text-lg">{account.meta.name}</p>
