@@ -312,6 +312,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         .sort(([, a], [, b]) => (a["x-order"] || 0) - (b["x-order"] || 0))
         .map(([key, field]) => {
           const isRequired = schema.Input?.required?.includes(key);
+          const isJsonField = field.title && field.title.includes("Json");
+          const isLongString =
+            typeof field.default === "string" && field.default.length > 20;
           return (
             <div key={key} className="flex flex-col">
               <div className="flex justify-between">
@@ -409,8 +412,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     typeof field.default === "number" ? field.default : 0
                   }
                 />
-              ) : typeof field.default === "string" &&
-                field.default.length > 20 ? (
+              ) : isJsonField || isLongString ? (
                 <textarea
                   id={key}
                   name={key}
