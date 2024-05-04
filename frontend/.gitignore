@@ -29,7 +29,7 @@ yarn-error.log*
 .env*.local
 
 # productiom env files
-.env*.productiom
+.env*.production
 
 # env files
 .env
