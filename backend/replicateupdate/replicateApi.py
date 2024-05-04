@@ -40,7 +40,7 @@ def get_data(str):
         data = response.json()
         next = data.get('next')
         if next is None:
-            
+            count =1
             return
         else :    
             dataArray = data.get('results')

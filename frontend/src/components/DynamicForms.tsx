@@ -461,7 +461,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
               <div className="mt-1 opacity-60 text-[0.75rem]">
                 <div>{field.description}</div>
                 {field.default !== undefined ? (
-                  <div>Default: {field.default.toString()}</div>
+                  <div>Default: {field.default?.toString()}</div>
                 ) : null}
               </div>
             </div>
