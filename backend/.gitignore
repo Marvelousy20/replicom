@@ -28,7 +28,7 @@ yarn-error.log*
 # local env files
 .env*.local
 
-# productiom env files
+# production env files
 .env*.production
 
 # env files
