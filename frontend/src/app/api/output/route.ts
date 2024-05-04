@@ -57,10 +57,20 @@ export async function GET(request: NextRequest) {
 
 
     if (predictionReplay.status == "succeeded") {
-      const predictionSave = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, {
-        walletAddress: `${walletAddress}`, status: 'succeeded', model: predictionReplay.model, created: predictionReplay.created_at,
-        time: predictionReplay.metrics.predict_time
-      })
+      console.log(walletAddress, predictionReplay.model, predictionReplay.created_at, predictionReplay.metrics, predictionReplay, "----------scuee-lang")
+      if (predictionReplay.metrics.predict_time == undefined) {
+        console.log('---')
+        const predictionSave = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, {
+          walletAddress: `${walletAddress}`, status: 'succeeded', model: predictionReplay.model, created: predictionReplay.created_at,
+          time: predictionReplay.metrics.output_token_count
+        })
+      }
+      else {
+        const predictionSave = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/prediction/`, {
+          walletAddress: `${walletAddress}`, status: 'succeeded', model: predictionReplay.model, created: predictionReplay.created_at,
+          time: predictionReplay.metrics.predict_time
+        })
+      }
 
     }
     if (predictionReplay.status == "failed") {

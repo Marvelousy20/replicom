@@ -10,7 +10,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 class ReplicateViewSet(viewsets.ModelViewSet):
-    queryset = ReplicateData.objects.all().order_by('key')
+    queryset = ReplicateData.objects.all().order_by('-likes')
     serializer_class = ReplicateSerializer
     permission_classes = [AllowAny]
 

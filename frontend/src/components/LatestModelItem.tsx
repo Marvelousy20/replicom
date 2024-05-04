@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa6";
 import { useRouter } from "next/dist/client/components/navigation";
-interface ModelItemProps {
+interface LatestModelItemProps {
   cover_image_url: string;
   name: string;
   owner: string;
@@ -12,13 +12,13 @@ interface ModelItemProps {
   description: string;
 }
 
-export default function ModelItem({
+export default function LatestModelItem({
   cover_image_url,
   name,
   owner,
   github,
   description
-}: ModelItemProps) {
+}: LatestModelItemProps) {
   const router = useRouter();
 
   const onClickGitHubHandle = () => {
@@ -26,10 +26,10 @@ export default function ModelItem({
   };
 
   return (
-    <div className="drop-shadow-[2px_2px_5px_rgba(0,0,0,0.16)] rounded-b-[7px] rounded-t-[7px] bg-slate-200 dark:bg-gray-800">
-      <div className="relative z-0 flex flex-col ">
+    <div className="bg-transparent dark:bg-gray-900">
+      <div className=" flex flex-row gap-x-[24px] ">
         <div
-          className="cursor-pointer  w-full h-[320px] flex justify-center items-center"
+          className="cursor-pointer  w-[144px] h-[128px] flex justify-center items-center bg-slate-100"
           onClick={() =>
             router.push(`/modelDetail?owner=${owner}&name=${name}`)
           }
@@ -37,14 +37,14 @@ export default function ModelItem({
           {cover_image_url ? (
             <Image
               src={cover_image_url}
-              width={500}
-              height={320}
+              width={144}
+              height={128}
               alt="Image"
-              className="rounded-t-[7px] w-full h-[320px] object-cover"
+              className="w-[144px] h-[128px] object-cover"
             />
           ) : (
             <Image
-              className="rounded-t-[7px] w-full  hidden"
+              className=" w-[40px] h-[40px]"
               src={"/img/back-logo.png"}
               width={32}
               height={32}
@@ -52,8 +52,8 @@ export default function ModelItem({
             />
           )}
         </div>
-        <div className="p-[12px]">
-          <h4 className="left-[10px] max-w-full truncate  font-bold text-gray-800 text-[24px] w-[80%] dark:text-white">
+        <div className="p-[12px] w-[calc(100%-168px)]">
+          <h4 className="   font-bold text-gray-800 text-[24px] dark:text-white">
             {owner}/{name}
           </h4>
           <p className="dark:text-white text-black mt-[15px]">
@@ -62,12 +62,12 @@ export default function ModelItem({
         </div>
 
 
-        <div className="flex gap-x-[10px] items-center absolute  top-[338px] right-[10px]">
+        {/* <div className="flex gap-x-[10px] items-center absolute  top-[338px] right-[10px]">
           <FaGithub
             className="text-gray-800 w-[20px] h-[20px] cursor-pointer dark:text-white"
             onClick={() => onClickGitHubHandle()}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

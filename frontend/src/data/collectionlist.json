@@ -1,0 +1,82 @@
+[
+    {
+        "name": "Extract text from images",
+        "slug": "text-recognition-ocr",
+        "description": "Optical character recognition (OCR) and text extraction"
+    },
+    {
+        "name": "Generate speech",
+        "slug": "text-to-speech",
+        "description": "Convert text to speech"
+    },
+    {
+        "name": "Transcribe speech",
+        "slug": "transcribe-speech",
+        "description": "Models that convert speech to text"
+    },
+    {
+        "name": "Use a face to make images",
+        "slug": "use-face-to-make-images",
+        "description": "Make realistic images of people instantly"
+    },
+    {
+        "name": "Use handy tools",
+        "slug": "utilities",
+        "description": "Toolbelt-type models for videos and images."
+    },
+    {
+        "name": "Make 3D stuff",
+        "slug": "3d-models",
+        "description": "Models that generate 3D objects, scenes, radiance fields, textures and multi-views."
+    },
+    {
+        "name": "Chat with images",
+        "slug": "vision-models",
+        "description": "Ask language models about images"
+    },
+    {
+        "name": "Get structured data",
+        "slug": "language-models-with-grammar",
+        "description": "Language models that support grammar-based decoding as well as jsonschema constraints."
+    },
+    {
+        "name": "Edit images",
+        "slug": "image-editing",
+        "description": "Tools for manipulating images."
+    },
+    {
+        "name": "Get embeddings",
+        "slug": "embedding-models",
+        "description": "Models that generate embeddings from inputs"
+    },
+    {
+        "name": "Train a language model",
+        "slug": "trainable-language-models",
+        "description": "Language models that you can fine-tune using Replicate's training API."
+    },
+    {
+        "name": "Use a language model",
+        "slug": "language-models",
+        "description": "Models that can understand and generate text"
+    },
+    {
+        "name": "Generate music",
+        "slug": "audio-generation",
+        "description": "Models to generate and modify music"
+    },
+    {
+        "name": "Caption images",
+        "slug": "image-to-text",
+        "description": "Models that generate text from images"
+    },
+    {
+        "name": "Restore images",
+        "slug": "image-restoration",
+        "description": "Models that improve or restore images by deblurring, colorization, and removing noise"
+    },
+    {
+        "name": "Generate images",
+        "slug": "text-to-image",
+        "description": "Models that generate images from text prompts"
+    }
+]

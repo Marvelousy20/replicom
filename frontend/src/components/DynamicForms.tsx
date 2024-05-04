@@ -312,6 +312,9 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
         .sort(([, a], [, b]) => (a["x-order"] || 0) - (b["x-order"] || 0))
         .map(([key, field]) => {
           const isRequired = schema.Input?.required?.includes(key);
+          const isJsonField = field.title && field.title.includes("Json");
+          const isLongString =
+            typeof field.default === "string" && field.default.length > 20;
           return (
             <div key={key} className="flex flex-col">
               <div className="flex justify-between">
@@ -387,7 +390,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     name={key}
                     checked={formData[key] as boolean} // Cast to boolean since formData[key] is boolean
                     onChange={(event) => handleBooleanInputChange(event, key)}
-                    // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
+                  // className="mt-1 px-2 py-2 block w-full border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 outline-none"
                   />
                   <div>{field.description}</div>
                 </div>
@@ -409,8 +412,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
                     typeof field.default === "number" ? field.default : 0
                   }
                 />
-              ) : typeof field.default === "string" &&
-                field.default.length > 20 ? (
+              ) : isJsonField || isLongString ? (
                 <textarea
                   id={key}
                   name={key}
@@ -459,7 +461,7 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
               <div className="mt-1 opacity-60 text-[0.75rem]">
                 <div>{field.description}</div>
                 {field.default !== undefined ? (
-                  <div>Default: {field.default.toString()}</div>
+                  <div>Default: {field.default?.toString()}</div>
                 ) : null}
               </div>
             </div>
@@ -475,9 +477,8 @@ const DynamicForms: React.FC<DynamicFormProps> = ({
             Reset
           </div>
           <div
-            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${
-              isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
-            }`}
+            className={`bg-black text-white font-bold py-2 px-4 rounded hover:bg-opacity-70 ${isButtonEnabled ? "" : "bg-opacity-70 cursor-not-allowed"
+              }`}
           >
             <button type="submit" disabled={!isButtonEnabled}>
               Boot + Runs

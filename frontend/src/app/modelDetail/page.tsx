@@ -157,7 +157,23 @@ export default function ModelDetails() {
     console.log("OUTPUT INSIDE RENDER OUTPUT FUNCTION", output);
 
     if (Array.isArray(output)) {
-      if (output.every((item) => typeof item === "string")) {
+      if (
+        output.every(
+          (item) =>
+            typeof item === "string" &&
+            (item.startsWith("http://") || item.startsWith("https://"))
+        )
+      ) {
+        return (
+          <div>
+            {output.map((url, index) => (
+              <div key={index} className="image-container">
+                {renderMedia(url)}
+              </div>
+            ))}
+          </div>
+        );
+      } else if (output.every((item) => typeof item === "string")) {
         return <div>{output.join(" ")}</div>; // Joins all strings with a space
       }
       return output.map((item, index) => (
