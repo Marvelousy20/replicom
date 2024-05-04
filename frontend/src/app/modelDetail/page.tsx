@@ -194,7 +194,20 @@ export default function ModelDetails() {
           </div>
         );
       }
-      return <pre>{JSON.stringify(output, null, 2)}</pre>; // JSON formatting for objects
+      return (
+        <div className="object-container">
+          {Object.entries(output).map(([key, value], index) => (
+            <div key={index} className="flex mb-2">
+              <div className="font-medium">{key}:</div>
+              <div className="">
+                {typeof value === "object"
+                  ? renderOutput(value)
+                  : value?.toString()}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
     } else {
       return <span>{output}</span>;
     }
