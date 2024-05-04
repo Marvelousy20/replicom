@@ -196,16 +196,24 @@ export default function ModelDetails() {
       }
       return (
         <div className="object-container">
-          {Object.entries(output).map(([key, value], index) => (
-            <div key={index} className="flex mb-2">
-              <div className="font-medium">{key}:</div>
-              <div className="">
-                {typeof value === "object"
-                  ? renderOutput(value)
-                  : value?.toString()}
+          <div className="space-y-4">
+            {Object.entries(output).map(([key, value], index) => (
+              <div key={index} className="flex flex-col">
+                <div className="font-bold">{key}:</div>
+                <div
+                  className={`mt-1 ${
+                    (value?.toString() || "").length > 110
+                      ? "max-h-36 overflow-auto bg-gray-300 dark:bg-gray-500 p-2"
+                      : ""
+                  }`}
+                >
+                  {typeof value === "object"
+                    ? renderOutput(value)
+                    : value?.toString()}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
     } else {
