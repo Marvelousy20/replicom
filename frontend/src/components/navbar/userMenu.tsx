@@ -1,14 +1,13 @@
 "use client";
-import { signOut, signIn, useSession } from "next-auth/react";
-import Image from "next/image";
-import { IoReorderThreeOutline } from "react-icons/io5";
+import { signIn, useSession } from "next-auth/react";
 import { ethers } from "ethers";
-import { User } from "next-auth";
+import { Button } from "../ui/button";
 import { UserContext } from "@/components/UseContext";
 import UserMenuDetail from "./userMenuDetail";
 import axios from "axios";
 import { useContext, useEffect } from "react";
 import Connect from "../NewConnect";
+import { useRouter } from "next/navigation";
 
 type userContextType = {
   walletAddress: string | null;
@@ -33,6 +32,7 @@ declare global {
 const UserMenu = () => {
   const { status } = useSession();
   const { user, setUser } = useContext(UserContext);
+  const router = useRouter();
 
   async function onSignInWithCrypto() {
     try {
@@ -81,6 +81,7 @@ const UserMenu = () => {
   return (
     <>
       <div className="flex items-center">
+        {/* <Button className="mr-1">Create Model</Button> */}
         <Connect signInWithCrypto={onSignInWithCrypto} />
         <div>{status === "authenticated" ? <UserMenuDetail /> : null}</div>
       </div>

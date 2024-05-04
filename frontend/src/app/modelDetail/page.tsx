@@ -154,7 +154,12 @@ export default function ModelDetails() {
   // Check if the output is a URL or structured data
 
   const renderOutput = (output: any) => {
+    console.log("OUTPUT INSIDE RENDER OUTPUT FUNCTION", output);
+
     if (Array.isArray(output)) {
+      if (output.every((item) => typeof item === "string")) {
+        return <div>{output.join(" ")}</div>; // Joins all strings with a space
+      }
       return output.map((item, index) => (
         <div key={index}>{renderOutput(item)}</div>
       ));
@@ -164,6 +169,15 @@ export default function ModelDetails() {
     ) {
       return renderMedia(output);
     } else if (typeof output === "object" && output !== null) {
+      // Check if the object has a `result_image` key
+      if (output.result_image) {
+        return (
+          <div>
+            <pre className="mb-2">{JSON.stringify(output, null, 2)}</pre>
+            {renderMedia(output.result_image)}
+          </div>
+        );
+      }
       return <pre>{JSON.stringify(output, null, 2)}</pre>; // JSON formatting for objects
     } else {
       return <span>{output}</span>;
@@ -188,8 +202,10 @@ export default function ModelDetails() {
     }
   };
 
+  console.log("", prediction);
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="mt-20">Loading...</div>}>
       <div className="flex flex-col items-center w-full text-black dark:text-white">
         <div className="px-4 lg:px-16 w-full">
           {/* <div className="mb-4 inline-flex" onClick={handleBack}>
